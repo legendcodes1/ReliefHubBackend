@@ -1,0 +1,9 @@
+POST http://localhost:3000/api/v1/excersises
+Content-Type: application/json
+
+{
+    "title" : "dumbell curl", 
+    "description": "curling a dumbell for relief" , 
+    "video_url" : "https://test", 
+    "safety_notes" : "be careful when doing reps"
+}
