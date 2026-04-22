@@ -7,66 +7,73 @@ datasource db {
   provider = "postgresql"
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model body_parts {
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String      @unique @db.VarChar(100)
+  exercises exercises[]
+}
+
+model discomfort_types {
   id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name       String      @db.VarChar
+  name       String      @unique @db.VarChar(100)
   created_at DateTime    @default(now()) @db.Timestamptz(6)
   exercises  exercises[]
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model discomfort_level {
-  id         String      @id @db.Uuid
-  level      Int?        @db.SmallInt
-  created_at DateTime    @default(now()) @db.Timestamptz(6)
-  exercises  exercises[]
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model exercises {
   id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title               String                @db.VarChar
+  title               String                @db.VarChar(150)
+  body_part_id        String                @db.Uuid
+  discomfort_type_id  String                @db.Uuid
   description         String
-  video_url           String                @db.VarChar
-  safety_notes        String
+  duration_minutes    Int?                  @db.SmallInt
+  video_url           String?
+  safety_notes        String?
+  difficulty_level    String?               @default("beginner") @db.VarChar(20)
   created_at          DateTime              @default(now()) @db.Timestamptz(6)
-  updated_at          DateTime?             @default(now()) @db.Timestamptz(6)
-  body_part_id        String                @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  discomfort_level_id String                @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  body_parts          body_parts            @relation(fields: [body_part_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  discomfort_level    discomfort_level      @relation(fields: [discomfort_level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updated_at          DateTime              @default(now()) @db.Timestamptz(6)
+  body_parts          body_parts            @relation(fields: [body_part_id], references: [id], onUpdate: NoAction, map: "fk_exercises_body_part")
+  discomfort_types    discomfort_types      @relation(fields: [discomfort_type_id], references: [id], onUpdate: NoAction, map: "fk_exercises_discomfort_type")
   routine_completions routine_completions[]
-  saved_exercise      saved_exercise[]
+  saved_exercises     saved_exercises[]
+
+  @@index([body_part_id], map: "idx_exercises_body_part_id")
+  @@index([discomfort_type_id], map: "idx_exercises_discomfort_type_id")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model routine_completions {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at  DateTime  @default(now()) @db.Timestamptz(6)
-  notes       String
-  user_id     String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  exercise_id String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  exercises   exercises @relation(fields: [exercise_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String    @db.Uuid
+  exercise_id  String    @db.Uuid
+  completed_at DateTime  @default(now()) @db.Timestamptz(6)
+  notes        String?
+  exercises    exercises @relation(fields: [exercise_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_routine_completions_exercise")
+  users        users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_routine_completions_user")
+
+  @@index([exercise_id], map: "idx_routine_completions_exercise_id")
+  @@index([user_id], map: "idx_routine_completions_user_id")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model saved_exercise {
+model saved_exercises {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String    @db.Uuid
+  exercise_id String    @db.Uuid
   created_at  DateTime  @default(now()) @db.Timestamptz(6)
-  exercise_id String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id     String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  exercises   exercises @relation(fields: [exercise_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  exercises   exercises @relation(fields: [exercise_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_saved_exercises_exercise")
+  users       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_saved_exercises_user")
+
+  @@unique([user_id, exercise_id], map: "uq_saved_exercise")
+  @@index([exercise_id], map: "idx_saved_exercises_exercise_id")
+  @@index([user_id], map: "idx_saved_exercises_user_id")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model users {
   id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username            String                @unique @db.VarChar
-  email               String                @unique
+  username            String                @unique @db.VarChar(50)
+  email               String                @unique @db.VarChar(255)
   created_at          DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime              @default(now()) @db.Timestamptz(6)
   routine_completions routine_completions[]
-  saved_exercise      saved_exercise[]
+  saved_exercises     saved_exercises[]
 }

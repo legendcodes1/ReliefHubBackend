@@ -1,9 +1,56 @@
+GET http://localhost:3000
+Content-Type: application/json
+
+
+
+###
+GET http://localhost:3000/api/v1/users
+Content-Type: application/json
+
+###
+POST http://localhost:3000/api/v1/users
+Content-Type: application/json
+
+{
+    "username" : "Baki Hanma", 
+    "email": "BakiHanma@gmail.com"
+}
+
+###
+GET http://localhost:3000/api/v1/excersises
+
+####
 POST http://localhost:3000/api/v1/excersises
 Content-Type: application/json
 
 {
-    "title" : "dumbell curl", 
-    "description": "curling a dumbell for relief" , 
-    "video_url" : "https://test", 
-    "safety_notes" : "be careful when doing reps"
+  "title": "Arm rotation",
+  "body_part_id": "4022ed3f-df08-4ddb-89ec-8b56c5ab1b4c",
+  "discomfort_type_id": "e9d82fa0-9f1b-49bc-a72b-61b1e7f4877a",
+  "description": "Turn your arm clockwise and counterclockwise, 5 full rotation",
+  "duration_minutes": 5,
+  "video_url": "https://test",
+  "safety_notes": "be careful when doing reps",
+  "difficulty_level": "beginner"
+}
+
+###
+PUT http://localhost:3000/api/v1/excersises/0d6a9876-e84c-4589-81c7-89af0c2759f7
+Content-Type: application/json
+
+{
+  "safety_notes": "Overstretching feels good"
+}
+
+###
+DELETE  http://localhost:3000/api/v1/excersises/9100fd80-af0c-4cec-91a1-24577e41159d
+
+
+
+###
+POST http://localhost:3000/api/v1/discomfort
+Content-Type: application/json
+
+{
+    "name": "Stiffness"
 }
