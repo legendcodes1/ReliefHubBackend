@@ -43,9 +43,7 @@ Content-Type: application/json
 }
 
 ###
-DELETE  http://localhost:3000/api/v1/excersises/9100fd80-af0c-4cec-91a1-24577e41159d
-
-
+DELETE  http://localhost:3000/api/v1/excersises/e9f7dc07-9bc9-4881-a36f-aebe8a5f664e
 
 ###
 POST http://localhost:3000/api/v1/discomfort

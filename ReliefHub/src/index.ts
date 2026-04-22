@@ -1,5 +1,7 @@
 import express from "express"
 import {prisma} from "./lib/prisma.js"
+import { createExerciseController } from "./controllers/excersiseController.js";
+import exerciseRouter from "./routes/exerciseRoute.js";
 
 const app = express();
 app.use(express.json())
@@ -12,7 +14,6 @@ const routerDiscomfort = express.Router();
 app.get("/", (req,res) => {
     res.send({sucess:true});
 })
-
 
 router.get("/", async (req, res) => {
   try {
@@ -45,7 +46,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-
 routerExercises.get("/", async (req, res) => {
   try {
     const user = await prisma.exercises.findMany({
@@ -58,28 +58,28 @@ routerExercises.get("/", async (req, res) => {
   }
 });
 
-routerExercises.post("/", async (req, res) => {
-  const {title, body_part_id, discomfort_type_id, description, duration_minutes, video_url, safety_notes, difficulty_level} = req.body
-  try {
-    const excersises = await prisma.exercises.create({
-      data: {
-      title,
-      body_part_id,
-      discomfort_type_id,
-      description,
-      duration_minutes, 
-      video_url, 
-      safety_notes,
-      difficulty_level
-      }
-    });
+// routerExercises.post("/", async (req, res) => {
+//   const {title, body_part_id, discomfort_type_id, description, duration_minutes, video_url, safety_notes, difficulty_level} = req.body
+//   try {
+//     const excersises = await prisma.exercises.create({
+//       data: {
+//       title,
+//       body_part_id,
+//       discomfort_type_id,
+//       description,
+//       duration_minutes, 
+//       video_url, 
+//       safety_notes,
+//       difficulty_level
+//       }
+//     });
 
-    return res.status(201).json(excersises);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Failed to create excersise" });
-  }
-});
+//     return res.status(201).json(excersises);
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ error: "Failed to create excersise" });
+//   }
+// });
 
 routerExercises.put("/:id", async (req, res) => {
   const {id}  = req.params
@@ -148,7 +148,7 @@ routerDiscomfort.post("/", async (req, res) => {
 
 
 app.use("/api/v1/users", router)
-app.use("/api/v1/excersises", routerExercises)
+app.use("/api/v1/excersises", exerciseRouter)
 app.use("/api/v1/bodypart", routerBodypart)
 app.use("/api/v1/discomfort", routerDiscomfort)
 
