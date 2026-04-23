@@ -1,4 +1,4 @@
-import excersiseType from "../dto/excersiseType.js"
+import { CreateExerciseDto, UpdateExerciseDto } from "../dto/excersiseType.js"
 import { prisma } from "../lib/prisma.js"
 
 export const getExerciseRepo = async () => {
@@ -6,23 +6,23 @@ export const getExerciseRepo = async () => {
 }
 
 
-export const createExerciseRepo = async (data: excersiseType) => {
-    return prisma.exercises.create({
-      data: {
-        ...data,
-      }})
+export const createExerciseRepo = async (data: CreateExerciseDto) => {
+  return prisma.exercises.create({
+    data: {
+      ...data,
+    },
+  })
 }
 
-export const updateExerciseRepo = async (id: string, data: excersiseType) => {
-    return await prisma.exercises.update({
-      where: { id },
-      data: {...data },
- 
-    })
+export const updateExerciseRepo = async (id: string, data: UpdateExerciseDto) => {
+  return prisma.exercises.update({
+    where: { id },
+    data: { ...data },
+  })
 }
 
 export const deleteExerciseRepo = async (id: string) => {
-    return await prisma.exercises.delete({
-      where: { id },
-
-    })}
+  return prisma.exercises.delete({
+    where: { id },
+  })
+}
