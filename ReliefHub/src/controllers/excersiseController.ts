@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Prisma } from "../../generated/prisma/client.js";
 import { CreateExerciseDto, UpdateExerciseDto } from "../dto/excersiseType.js";
 import { createExercise, deleteExercise, ExerciseServiceError, getExercise, updateExercise } from "../service/exerciseService.js";
+import { findRecommendedExercise } from "../service/recommendationService.js";
 
 const handleExerciseError = (error: unknown, res: Response) => {
   if (error instanceof ExerciseServiceError) {
@@ -58,3 +59,28 @@ export const deleteExerciseController = async(req: Request<{id: string}>, res: R
   }
 }
 
+export const getRecommendedExercises = async (req: Request, res: Response) => {
+  try {
+    const { bodyPartId, discomfortTypeId, difficultyLevel, maxDuration } = req.query;
+
+    if (!bodyPartId || !discomfortTypeId) {
+      return res.status(400).json({
+        error: "bodyPartId and discomfortTypeId are required",
+      });
+    }
+
+    const exercises = await findRecommendedExercise({
+      bodyPartId: String(bodyPartId),
+      discomfortTypeId: String(discomfortTypeId),
+      difficultyLevel: difficultyLevel ? String(difficultyLevel) : undefined,
+      maxDuration: maxDuration ? Number(maxDuration) : undefined,
+    });
+
+    return res.status(200).json(exercises);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Failed to get recommended exercises",
+    });
+  }
+};

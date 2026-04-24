@@ -45,10 +45,26 @@ Content-Type: application/json
 ###
 DELETE  http://localhost:3000/api/v1/excersises/e9f7dc07-9bc9-4881-a36f-aebe8a5f664e
 
+
+###
+GET http://localhost:3000/api/v1/discomfort
+Content-Type: application/json
+
+###
+
+PUT http://localhost:3000/api/v1/discomfort/7d621fe2-2083-436e-8730-bcbf70c18b8b
+Content-Type: application/json
+
+{
+    "name": "Reduced range of motions"
+}
 ###
 POST http://localhost:3000/api/v1/discomfort
 Content-Type: application/json
 
 {
-    "name": "Stiffness"
+    "name": "I cant get up"
 }
+###
+DELETE  http://localhost:3000/api/v1/discomfort/17fab192-953c-4708-a737-0e29df4d74c5
+Content-Type: application/json
