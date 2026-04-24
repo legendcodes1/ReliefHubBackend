@@ -17,20 +17,20 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/api/v1/excersises
+GET http://localhost:3000/api/v1/exercisises
 
 ####
 POST http://localhost:3000/api/v1/excersises
 Content-Type: application/json
 
 {
-  "title": "Arm rotation",
-  "body_part_id": "4022ed3f-df08-4ddb-89ec-8b56c5ab1b4c",
+  "title": "Isometric hook strengthening",
+  "body_part_id": "24e2545d-fb64-42d6-9cad-086262c9a2b5",
   "discomfort_type_id": "e9d82fa0-9f1b-49bc-a72b-61b1e7f4877a",
-  "description": "Turn your arm clockwise and counterclockwise, 5 full rotation",
-  "duration_minutes": 5,
-  "video_url": "https://test",
-  "safety_notes": "be careful when doing reps",
+  "description": "go into a hook fist and try to pull apart will some resistance, hold for a second or to and then flip",
+  "duration_minutes": 3,
+  "video_url": "https://www.youtube.com/watch?v=2G6pHQJEbWQ",
+  "safety_notes": "you can go slow, nice and controlled or fast",
   "difficulty_level": "beginner"
 }
 
@@ -68,3 +68,7 @@ Content-Type: application/json
 ###
 DELETE  http://localhost:3000/api/v1/discomfort/17fab192-953c-4708-a737-0e29df4d74c5
 Content-Type: application/json
+
+###
+
+GET http://localhost:3000/api/v1/exercisises/recommendations?bodyPartId=4022ed3f-df08-4ddb-89ec-8b56c5ab1b4c&discomfortTypeId=e9d82fa0-9f1b-49bc-a72b-61b1e7f4877a
