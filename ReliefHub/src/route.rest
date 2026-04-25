@@ -20,22 +20,22 @@ Content-Type: application/json
 GET http://localhost:3000/api/v1/exercisises
 
 ####
-POST http://localhost:3000/api/v1/excersises
+POST http://localhost:3000/api/v1/exercisises
 Content-Type: application/json
 
 {
-  "title": "Isometric hook strengthening",
+  "title": "test refactor stretch",
   "body_part_id": "24e2545d-fb64-42d6-9cad-086262c9a2b5",
   "discomfort_type_id": "e9d82fa0-9f1b-49bc-a72b-61b1e7f4877a",
   "description": "go into a hook fist and try to pull apart will some resistance, hold for a second or to and then flip",
   "duration_minutes": 3,
-  "video_url": "https://www.youtube.com/watch?v=2G6pHQJEbWQ",
+  "video_url": "https://test",
   "safety_notes": "you can go slow, nice and controlled or fast",
   "difficulty_level": "beginner"
 }
 
 ###
-PUT http://localhost:3000/api/v1/excersises/0d6a9876-e84c-4589-81c7-89af0c2759f7
+PUT http://localhost:3000/api/v1/exercisises/0d6a9876-e84c-4589-81c7-89af0c2759f7
 Content-Type: application/json
 
 {
@@ -43,7 +43,7 @@ Content-Type: application/json
 }
 
 ###
-DELETE  http://localhost:3000/api/v1/excersises/e9f7dc07-9bc9-4881-a36f-aebe8a5f664e
+DELETE  http://localhost:3000/api/v1/exercisises/b247f7fa-236a-4090-aee1-80e74206c752
 
 
 ###
