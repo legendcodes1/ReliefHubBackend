@@ -5,7 +5,6 @@ export const getExerciseRepo = async () => {
     return prisma.exercises.findMany()
 }
 
-
 export const createExerciseRepo = async (data: CreateExerciseDto) => {
   return prisma.exercises.create({
     data: {
