@@ -1,5 +1,5 @@
 import { CreateExerciseDto, UpdateExerciseDto } from "../dto/excersiseType.js";
-import { getExerciseRepo, createExerciseRepo, updateExerciseRepo, deleteExerciseRepo } from "../repositories/excerciseRepo.js";
+import { prisma } from "../lib/prisma.js"
 
 export class ExerciseServiceError extends Error {
   statusCode: number;
@@ -38,12 +38,16 @@ const validateUpdatePayload = (data: UpdateExerciseDto) => {
 };
 
 export const getExercise = async () => {
-  return getExerciseRepo();
+  return prisma.exercises.findMany()
 }
 
 export const createExercise = async (data: CreateExerciseDto) => {
   validateCreatePayload(data);
-  return createExerciseRepo(data);
+   return prisma.exercises.create({
+    data: {
+      ...data,
+    },
+  })
 }
 
 export const updateExercise = async(id: string, data: UpdateExerciseDto) => {
@@ -52,7 +56,10 @@ export const updateExercise = async(id: string, data: UpdateExerciseDto) => {
   }
 
   validateUpdatePayload(data);
-  return updateExerciseRepo(id, data);
+   return prisma.exercises.update({
+    where: { id },
+    data: { ...data },
+  })
 }
 
 export const deleteExercise = async(id: string) => {
@@ -60,5 +67,7 @@ export const deleteExercise = async(id: string) => {
     throw new ExerciseServiceError("id is required", 400);
   }
 
-  return deleteExerciseRepo(id);
+   return prisma.exercises.delete({
+    where: { id },
+  })
 }
