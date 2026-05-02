@@ -1,4 +1,11 @@
 import { supabase } from "../config/supabase.js";
+function extractBearerToken(authorization) {
+    if (!authorization || !authorization.startsWith("Bearer ")) {
+        return null;
+    }
+    const token = authorization.slice("Bearer ".length).trim();
+    return token || null;
+}
 function mapAuthPayload(user, session) {
     return {
         user: {
@@ -54,9 +61,21 @@ export async function login(req, res) {
         ...mapAuthPayload(data.user, data.session),
     });
 }
-export async function logout(_req, res) {
+export async function logout(req, res) {
+    const token = extractBearerToken(req.headers.authorization);
+    if (!token) {
+        return res.status(401).json({
+            message: "Authorization token is required",
+        });
+    }
+    const { error } = await supabase.auth.admin.signOut(token, "global");
+    if (error) {
+        return res.status(500).json({
+            message: "Unable to revoke session",
+        });
+    }
     return res.status(200).json({
-        message: "Logged out successfully",
+        message: "Logged out successfully and session revoked",
     });
 }
 export async function me(req, res) {

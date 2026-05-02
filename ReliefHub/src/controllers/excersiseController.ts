@@ -1,25 +1,25 @@
 import { Request, Response } from "express";
 import { Prisma } from "../../generated/prisma/client.js";
 import { CreateExerciseDto, UpdateExerciseDto } from "../dto/excersiseType.js";
-import { createExercise, deleteExercise, ExerciseServiceError, getExercise, updateExercise } from "../service/exerciseService.js";
+import { createExercise, deleteExercise, ExerciseServiceError, getExercise, getExerciseById, updateExercise } from "../service/exerciseService.js";
 import { findRecommendedExercise } from "../service/recommendationService.js";
 
 const handleExerciseError = (error: unknown, res: Response) => {
   if (error instanceof ExerciseServiceError) {
-    return res.status(error.statusCode).json({ error: error.message });
+    return res.status(error.statusCode).json({ message: error.message });
   }
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === "P2025") {
-      return res.status(404).json({ error: "Exercise not found" });
+      return res.status(404).json({ message: "Exercise not found" });
     }
 
     if (error.code === "P2003") {
-      return res.status(400).json({ error: "Invalid reference id for body part or discomfort type" });
+      return res.status(400).json({ message: "Invalid reference id for body part or discomfort type" });
     }
   }
 
-  return res.status(500).json({ error: "Internal server error" });
+  return res.status(500).json({ message: "Internal server error" });
 };
 
 export const getExerciseController = async(req: Request, res: Response) => {
@@ -35,6 +35,15 @@ export const createExerciseController = async(req: Request, res: Response) => {
   try {
     const createdExercise = await createExercise(req.body as CreateExerciseDto);
     return res.status(201).json(createdExercise);
+  } catch (error) {
+    return handleExerciseError(error, res);
+  }
+}
+
+export const getExerciseByIdController = async(req: Request<{id: string}>, res: Response) => {
+  try {
+    const exercise = await getExerciseById(req.params.id);
+    return res.status(200).json(exercise);
   } catch (error) {
     return handleExerciseError(error, res);
   }
@@ -65,7 +74,7 @@ export const getRecommendedExercises = async (req: Request, res: Response) => {
 
     if (!bodyPartId || !discomfortTypeId) {
       return res.status(400).json({
-        error: "bodyPartId and discomfortTypeId are required",
+        message: "bodyPartId and discomfortTypeId are required",
       });
     }
 
@@ -80,7 +89,7 @@ export const getRecommendedExercises = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      error: "Failed to get recommended exercises",
+      message: "Failed to get recommended exercises",
     });
   }
 };

@@ -17,10 +17,10 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:4000/api/v1/exercisises
+GET http://localhost:4000/api/v1/exercises
 
 ####
-POST http://localhost:3000/api/v1/exercisises
+POST http://localhost:3000/api/v1/exercises
 Content-Type: application/json
 
 {
@@ -35,7 +35,7 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:3000/api/v1/exercisises/0d6a9876-e84c-4589-81c7-89af0c2759f7
+PUT http://localhost:3000/api/v1/exercises/0d6a9876-e84c-4589-81c7-89af0c2759f7
 Content-Type: application/json
 
 {
@@ -43,32 +43,32 @@ Content-Type: application/json
 }
 
 ###
-DELETE  http://localhost:3000/api/v1/exercisises/b247f7fa-236a-4090-aee1-80e74206c752
+DELETE  http://localhost:3000/api/v1/exercises/b247f7fa-236a-4090-aee1-80e74206c752
 
 
 ###
-GET http://localhost:3000/api/v1/discomfort
+GET http://localhost:3000/api/v1/discomfort-types
 Content-Type: application/json
 
 ###
 
-PUT http://localhost:3000/api/v1/discomfort/7d621fe2-2083-436e-8730-bcbf70c18b8b
+PUT http://localhost:3000/api/v1/discomfort-types/7d621fe2-2083-436e-8730-bcbf70c18b8b
 Content-Type: application/json
 
 {
     "name": "Reduced range of motions"
 }
 ###
-POST http://localhost:3000/api/v1/discomfort
+POST http://localhost:3000/api/v1/discomfort-types
 Content-Type: application/json
 
 {
     "name": "I cant get up"
 }
 ###
-DELETE  http://localhost:3000/api/v1/discomfort/17fab192-953c-4708-a737-0e29df4d74c5
+DELETE  http://localhost:3000/api/v1/discomfort-types/17fab192-953c-4708-a737-0e29df4d74c5
 Content-Type: application/json
 
 ###
 
-GET http://localhost:3000/api/v1/exercisises/recommendations?bodyPartId=4022ed3f-df08-4ddb-89ec-8b56c5ab1b4c&discomfortTypeId=e9d82fa0-9f1b-49bc-a72b-61b1e7f4877a
+GET http://localhost:3000/api/v1/exercises/recommendations?bodyPartId=4022ed3f-df08-4ddb-89ec-8b56c5ab1b4c&discomfortTypeId=e9d82fa0-9f1b-49bc-a72b-61b1e7f4877a

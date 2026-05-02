@@ -9,7 +9,7 @@ const authRouter = Router();
 
 authRouter.post("/signup", validateBody(signupSchema), signup);
 authRouter.post("/login", validateBody(loginSchema), login);
-authRouter.post("/logout", logout);
+authRouter.post("/logout", requireAuth, logout);
 authRouter.get("/me", requireAuth, me);
 
 export { authRouter };

@@ -41,6 +41,22 @@ export const getExercise = async () => {
   return prisma.exercises.findMany()
 }
 
+export const getExerciseById = async (id: string) => {
+  if (!id?.trim()) {
+    throw new ExerciseServiceError("id is required", 400);
+  }
+
+  const exercise = await prisma.exercises.findUnique({
+    where: { id },
+  });
+
+  if (!exercise) {
+    throw new ExerciseServiceError("Exercise not found", 404);
+  }
+
+  return exercise;
+}
+
 export const createExercise = async (data: CreateExerciseDto) => {
   validateCreatePayload(data);
    return prisma.exercises.create({
