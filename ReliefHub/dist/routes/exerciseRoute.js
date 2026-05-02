@@ -1,15 +1,11 @@
 import { Router } from "express";
 import { getExerciseController, createExerciseController, deleteExerciseController, getExerciseByIdController, updateExerciseController, getRecommendedExercises } from "../controllers/excersiseController.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
-
 const exerciseRouter = Router();
 exerciseRouter.get("/recommendations", requireAuth, getRecommendedExercises);
-
-exerciseRouter.get("/", requireAuth, getExerciseController)
-exerciseRouter.get("/:id", requireAuth, getExerciseByIdController)
-exerciseRouter.post("/", requireAuth, createExerciseController)
-exerciseRouter.put("/:id", requireAuth, updateExerciseController)
-exerciseRouter.delete("/:id", requireAuth, deleteExerciseController)
-
-
-export default exerciseRouter
+exerciseRouter.get("/", requireAuth, getExerciseController);
+exerciseRouter.get("/:id", requireAuth, getExerciseByIdController);
+exerciseRouter.post("/", requireAuth, createExerciseController);
+exerciseRouter.put("/:id", requireAuth, updateExerciseController);
+exerciseRouter.delete("/:id", requireAuth, deleteExerciseController);
+export default exerciseRouter;
