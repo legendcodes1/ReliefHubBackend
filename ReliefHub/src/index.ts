@@ -14,36 +14,6 @@ app.get("/", (req,res) => {
     res.send({sucess:true});
 })
 
-// router.get("/", async (req, res) => {
-//   try {
-
-//     const user = await prisma.users.findMany();
-
-
-//     return res.status(201).json(user);
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({ error: "Failed to find user" });
-//   }
-// });
-
-// router.post("/", async (req, res) => {
-//   try {
-//     const { username, email } = req.body;
-
-//     const user = await prisma.users.create({
-//       data: {
-//         username,
-//         email,
-//       },
-//     });
-
-//     return res.status(201).json(user);
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({ error: "Failed to create user" });
-//   }
-// });
 
 app.use("/api/v1/users", router)
 app.use("/api/v1/exercisises", exerciseRouter)
