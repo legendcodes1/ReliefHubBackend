@@ -1,0 +1,51 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+:root {
+  --font-display: "Fraunces", "Georgia", serif;
+  --font-body: "Manrope", "Segoe UI", sans-serif;
+
+  --bg-canvas: #f7f6f2;
+  --bg-soft: #fcfbf8;
+  --surface: #ffffff;
+  --surface-muted: #f1f5f1;
+  --line: #d8dfd8;
+
+  --text-strong: #192324;
+  --text-body: #314044;
+  --text-soft: #627175;
+
+  --brand: #1e7a67;
+  --brand-strong: #155e52;
+  --brand-soft: #dbf0ea;
+
+  --accent: #0f7480;
+  --warning-soft: #fff3db;
+  --warning-text: #8c5a1f;
+
+  color: var(--text-strong);
+  background-color: var(--bg-canvas);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--text-body);
+  background:
+    radial-gradient(1200px 500px at 20% -10%, #d8efe5 0%, transparent 70%),
+    radial-gradient(900px 400px at 90% 0%, #dbeff3 0%, transparent 70%),
+    linear-gradient(180deg, #faf9f6 0%, #f5f4ef 100%);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  color: var(--text-strong);
+  letter-spacing: -0.02em;
+}
+
+#root {
+  min-height: 100vh;
+}
