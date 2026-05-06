@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { saveExercise } from '../saved-exercises/savedExercisesApi'
 import type { Exercise } from './recommendationTypes'
+import { getYouTubeThumbnailUrl } from './youtube'
 
 type ExerciseCardProps = {
   exercise: Exercise
@@ -48,9 +49,9 @@ function LevelIcon() {
   )
 }
 
-function PlayIcon() {
+function PlayIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-3.5 w-3.5">
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className={className}>
       <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.4" />
       <path d="M8.5 7.6v4.8l4-2.4-4-2.4Z" fill="currentColor" />
     </svg>
@@ -61,6 +62,7 @@ export function ExerciseCard({ exercise }: ExerciseCardProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
   const accent = accentStyles[getAccentIndex(exercise.id)]
+  const thumbnailUrl = getYouTubeThumbnailUrl(exercise.video_url)
 
   async function handleSave() {
     setIsSaving(true)
@@ -89,13 +91,28 @@ export function ExerciseCard({ exercise }: ExerciseCardProps) {
       <div className={`mb-3 rounded-xl border px-3 py-2 ${accent.title}`}>
         <div className="flex items-start justify-between gap-3">
           <h3 className="text-xl font-semibold leading-tight text-[color:var(--text-strong)]">{exercise.title}</h3>
-          {exercise.video_url && (
+          {exercise.video_url && !thumbnailUrl && (
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700">
               <PlayIcon />
             </span>
           )}
         </div>
       </div>
+
+      {thumbnailUrl && (
+        <Link to={`/exercises/${exercise.id}`} className="group mb-4 block overflow-hidden rounded-xl border border-[color:var(--line)] bg-stone-100">
+          <div className="relative aspect-video">
+            <img src={thumbnailUrl} alt={`${exercise.title} video preview`} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" />
+            <div className="absolute inset-0 bg-stone-950/20 transition group-hover:bg-stone-950/30" />
+            <span className="absolute left-1/2 top-1/2 inline-flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-emerald-700 shadow-md transition group-hover:scale-105 group-hover:bg-white">
+              <PlayIcon className="h-6 w-6" />
+            </span>
+            {/* <span className="absolute bottom-2 left-2 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-stone-800 shadow-sm">
+              View video details
+            </span> */}
+          </div>
+        </Link>
+      )}
 
       <p className="text-sm leading-relaxed text-[color:var(--text-body)]">{exercise.description}</p>
 

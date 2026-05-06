@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { ExerciseVideo } from '../features/recommendations/ExerciseVideo'
 import { getExerciseById } from '../features/recommendations/recommendationsApi'
 import type { Exercise } from '../features/recommendations/recommendationTypes'
 
@@ -49,6 +50,12 @@ export function ExerciseDetailPage() {
     }
   }, [id])
 
+  useEffect(() => {
+    if (exercise?.video_url) {
+      console.log('Exercise video_url:', exercise.video_url)
+    }
+  }, [exercise?.video_url])
+
   return (
     <main className="space-y-5">
       <section className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-6 sm:p-7">
@@ -66,6 +73,8 @@ export function ExerciseDetailPage() {
             <div className="mb-4 h-1.5 w-28 rounded-full bg-[linear-gradient(90deg,_#10b981_0%,_#06b6d4_100%)]" />
             <h2 className="text-2xl font-semibold text-[color:var(--text-strong)]">{exercise.title}</h2>
             <p className="mt-3 text-sm leading-relaxed text-[color:var(--text-body)]">{exercise.description}</p>
+
+            <ExerciseVideo videoUrl={exercise.video_url} title={exercise.title} className="mt-4" />
 
             <div className="mt-4 flex flex-wrap gap-2 text-xs">
               {exercise.duration_minutes !== null && exercise.duration_minutes !== undefined && (
@@ -101,11 +110,6 @@ export function ExerciseDetailPage() {
               </div>
             </div>
 
-            {exercise.video_url && (
-              <a href={exercise.video_url} target="_blank" rel="noreferrer" className="mt-4 inline-block rounded-lg border border-stone-300 px-3 py-1.5 text-sm text-stone-800 transition hover:bg-stone-100">
-                Open Video
-              </a>
-            )}
           </article>
 
           <aside className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface)] p-5">
