@@ -1,0 +1,4 @@
+Controller: Handles HTTP request/response
+Service: validates some business rule and orchestrates repo calls
+Repo: talks to prisma
+DTO: Describes payload shapes(TYPES)
