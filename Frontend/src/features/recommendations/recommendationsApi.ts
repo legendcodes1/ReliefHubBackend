@@ -6,6 +6,12 @@ type RecommendationFilters = {
   discomfortTypeId: string
 }
 
+export async function getAllExercises() {
+  return requestJson<Exercise[]>('/api/v1/exercises', {
+    withAuth: true,
+  })
+}
+
 export async function getRecommendations(filters: RecommendationFilters) {
   return requestJson<Exercise[]>('/api/v1/exercises/recommendations', {
     withAuth: true,

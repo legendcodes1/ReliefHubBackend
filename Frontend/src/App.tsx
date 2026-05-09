@@ -7,6 +7,8 @@ import { ExerciseDetailPage } from './pages/ExerciseDetailPage'
 import { HomePage } from './pages/HomePage'
 import { RecommendationsPage } from './pages/RecommendationsPage'
 import { SavedExercisesPage } from './pages/SavedExercisesPage'
+import RoutinePage from './pages/RoutinePage'
+import { MyRoutinesPage } from './pages/MyRoutinesPage'
 
 function App() {
   return (
@@ -64,6 +66,26 @@ function App() {
           <ProtectedRoute>
             <AppLayout>
               <SavedExercisesPage />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+        <Route
+        path="/routines"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <RoutinePage/>
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-routines"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <MyRoutinesPage />
             </AppLayout>
           </ProtectedRoute>
         }

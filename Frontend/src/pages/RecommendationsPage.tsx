@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSearchParams } from 'react-router-dom'
+import { ChevronUp, ChevronDown } from 'lucide-react'
 import { ExerciseCard } from '../features/recommendations/ExerciseCard'
 import { getRecommendations } from '../features/recommendations/recommendationsApi'
 import type { Exercise } from '../features/recommendations/recommendationTypes'
+import RoutinePage from './RoutinePage'
 
 export function RecommendationsPage() {
   const [searchParams] = useSearchParams()
@@ -12,6 +14,7 @@ export function RecommendationsPage() {
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [isRoutineExpanded, setIsRoutineExpanded] = useState(false)
   const hasFilters = Boolean(bodyPartId && discomfortTypeId)
   const recommendationsCount = exercises.length
 
@@ -51,7 +54,10 @@ export function RecommendationsPage() {
       setError('')
 
       try {
-        const result = await getRecommendations({ bodyPartId: bodyPartId as string, discomfortTypeId: discomfortTypeId as string })
+        const result = await getRecommendations({
+          bodyPartId: bodyPartId as string,
+          discomfortTypeId: discomfortTypeId as string,
+        })
 
         if (!result.response.ok) {
           throw new Error('Unable to fetch recommendations')
@@ -89,13 +95,30 @@ export function RecommendationsPage() {
             ? `Found ${recommendationsCount} ${recommendationsCount === 1 ? 'exercise' : 'exercises'} for you`
             : getRecommendationCountLabel()}
         </p>
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap gap-3">
           <Link to="/home" className="inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--bg-soft)] px-3 py-1.5 text-sm font-medium text-[color:var(--text-body)] transition hover:bg-white">
             Adjust Filters
           </Link>
+          <button
+            type="button"
+            onClick={() => setIsRoutineExpanded(!isRoutineExpanded)}
+            className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--bg-soft)] px-3 py-1.5 text-sm font-medium text-[color:var(--text-body)] transition hover:bg-white"
+          >
+            <span>Build Your Routine</span>
+            {isRoutineExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </button>
         </div>
       </section>
 
+      {isRoutineExpanded && (
+        <div className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-sm sm:p-6">
+          <RoutinePage />
+        </div>
+      )}
       {!hasFilters && (
         <p className="mt-4 rounded-xl bg-[color:var(--warning-soft)] p-3 text-sm text-[color:var(--warning-text)]">
           Missing filters. Please return to <Link to="/home" className="underline">home</Link> and select symptom options.

@@ -13,8 +13,6 @@ export function ExerciseVideo({ videoUrl, title, className = '' }: ExerciseVideo
 
   const embedUrl = getYouTubeEmbedUrl(videoUrl)
 
-  console.log('Exercise embed_url:', embedUrl)
-
   if (!embedUrl) {
     return (
       <a href={videoUrl} target="_blank" rel="noreferrer" className={`inline-block rounded-lg border border-stone-300 px-3 py-1.5 text-sm text-stone-800 transition hover:bg-stone-100 ${className}`}>

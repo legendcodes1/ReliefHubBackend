@@ -1,0 +1,11 @@
+import { Router } from "express";
+import { login, logout, me, signup } from "../controllers/authController.js";
+import { requireAuth } from "../middleware/authMiddleware.js";
+import { validateBody } from "../middleware/validateMiddleware.js";
+import { loginSchema, signupSchema } from "../validators/authSchema.js";
+const authRouter = Router();
+authRouter.post("/signup", validateBody(signupSchema), signup);
+authRouter.post("/login", validateBody(loginSchema), login);
+authRouter.post("/logout", requireAuth, logout);
+authRouter.get("/me", requireAuth, me);
+export { authRouter };

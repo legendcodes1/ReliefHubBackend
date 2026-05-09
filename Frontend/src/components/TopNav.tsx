@@ -38,6 +38,9 @@ export function TopNav() {
           <NavLink to="/saved" className={navLinkClass}>
             Saved
           </NavLink>
+          <NavLink to="/my-routines" className={navLinkClass}>
+            My Routines
+          </NavLink>
           <NavLink to="/account" className={navLinkClass}>
             Account
           </NavLink>

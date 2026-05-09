@@ -50,12 +50,6 @@ export function ExerciseDetailPage() {
     }
   }, [id])
 
-  useEffect(() => {
-    if (exercise?.video_url) {
-      console.log('Exercise video_url:', exercise.video_url)
-    }
-  }, [exercise?.video_url])
-
   return (
     <main className="space-y-5">
       <section className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-6 sm:p-7">
@@ -110,6 +104,11 @@ export function ExerciseDetailPage() {
               </div>
             </div>
 
+            {exercise.video_url && (
+              <a href={exercise.video_url} target="_blank" rel="noreferrer" className="mt-4 inline-block rounded-lg border border-stone-300 px-3 py-1.5 text-sm text-stone-800 transition hover:bg-stone-100">
+                Open Video
+              </a>
+            )}
           </article>
 
           <aside className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface)] p-5">
