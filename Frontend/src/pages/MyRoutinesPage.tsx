@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Trash2, Calendar } from 'lucide-react'
+import { Plus, Trash2, Calendar, Pencil } from 'lucide-react'
 import { getRoutines, deleteRoutine } from '../features/routine/routineApi'
+import { RoutineEditModal } from '../features/routine/RoutineEditModal'
+import { RoutineViewModal } from '../features/routine/RoutineViewModal'
 import type { Routine } from '../features/routine/routineTypes'
 
 export function MyRoutinesPage() {
@@ -9,6 +11,8 @@ export function MyRoutinesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null)
+  const [viewingRoutine, setViewingRoutine] = useState<Routine | null>(null)
 
   useEffect(() => {
     let isMounted = true
@@ -118,7 +122,8 @@ export function MyRoutinesPage() {
             {routines.map((routine) => (
               <article
                 key={routine.id}
-                className="flex h-full flex-col rounded-2xl border border-[color:var(--line)] bg-[color:var(--bg-soft)] p-4 shadow-sm"
+                onClick={() => setViewingRoutine(routine)}
+                className="flex h-full flex-col rounded-2xl border border-[color:var(--line)] bg-[color:var(--bg-soft)] p-4 shadow-sm cursor-pointer transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <div className="mb-3 flex items-center justify-between gap-2">
                   <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
@@ -152,7 +157,14 @@ export function MyRoutinesPage() {
                     )}
                   </ul>
                 </div>
-                <div className="mt-auto flex items-center gap-2 pt-4">
+                <div className="mt-auto flex items-center gap-2 pt-4" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    type="button"
+                    onClick={() => setEditingRoutine(routine)}
+                    className="rounded-xl border border-[color:var(--line)] bg-[color:var(--surface)] px-3 py-1.5 text-sm font-medium text-[color:var(--text-body)] transition hover:bg-[color:var(--bg-soft)]"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(routine.id)}
@@ -166,6 +178,33 @@ export function MyRoutinesPage() {
             ))}
           </div>
         </section>
+      )}
+
+      {editingRoutine && (
+        <RoutineEditModal
+          routineId={editingRoutine.id}
+          initialName={editingRoutine.name}
+          initialExercises={editingRoutine.routine_exercises}
+          onClose={() => setEditingRoutine(null)}
+          onSave={({ name, exercises }) => {
+            setRoutines((prev) =>
+              prev.map((r) =>
+                r.id === editingRoutine.id
+                  ? { ...r, name, routine_exercises: exercises }
+                  : r
+              )
+            )
+          }}
+        />
+      )}
+
+      {viewingRoutine && (
+        <RoutineViewModal
+          routineName={viewingRoutine.name}
+          exercises={viewingRoutine.routine_exercises}
+          createdAt={viewingRoutine.created_at}
+          onClose={() => setViewingRoutine(null)}
+        />
       )}
     </main>
   )
