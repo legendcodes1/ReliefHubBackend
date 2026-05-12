@@ -27,3 +27,11 @@ export async function deleteRoutine(id: string) {
     method: 'DELETE',
   })
 }
+
+export async function updateRoutine(id: string, name: string, exerciseIds: string[]) {
+  return requestJson<Routine>(`/api/v1/routines/${id}`, {
+    withAuth: true,
+    method: 'PUT',
+    body: { name, exercise_ids: exerciseIds },
+  })
+}

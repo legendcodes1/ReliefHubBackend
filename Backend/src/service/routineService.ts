@@ -6,6 +6,13 @@ interface CreateRoutineInput {
   exerciseIds: string[];
 }
 
+interface UpdateRoutineInput {
+  userId: string;
+  routineId: string;
+  name: string;
+  exerciseIds: string[];
+}
+
 export class RoutineServiceError extends Error {
   status: number;
 
@@ -149,5 +156,75 @@ export const deleteRoutineService = async (authUserId: string, routineId: string
 
   return prisma.routines.delete({
     where: { id: existingRoutine.id },
+  });
+};
+
+export const updateRoutineService = async (data: UpdateRoutineInput) => {
+  const { userId, routineId, name, exerciseIds } = data;
+
+  const publicUser = await getPublicUserByAuthId(userId);
+
+  if (!publicUser) {
+    throw new RoutineServiceError("User not found", 404);
+  }
+
+  const existingRoutine = await prisma.routines.findFirst({
+    where: {
+      id: routineId,
+      user_id: publicUser.id,
+    },
+  });
+
+  if (!existingRoutine) {
+    throw new RoutineServiceError("Routine not found", 404);
+  }
+
+  const duplicateIds = new Set<string>();
+  const seen = new Set<string>();
+
+  for (const exerciseId of exerciseIds) {
+    if (seen.has(exerciseId)) {
+      duplicateIds.add(exerciseId);
+    }
+    seen.add(exerciseId);
+  }
+
+  if (duplicateIds.size > 0) {
+    throw new RoutineServiceError("Duplicate exercise IDs are not allowed in a routine", 400);
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.routines.update({
+      where: { id: existingRoutine.id },
+      data: { name: name.trim() },
+    });
+
+    await tx.routine_exercises.deleteMany({
+      where: { routine_id: existingRoutine.id },
+    });
+
+    if (exerciseIds.length > 0) {
+      await tx.routine_exercises.createMany({
+        data: exerciseIds.map((exerciseId, index) => ({
+          routine_id: existingRoutine.id,
+          exercise_id: exerciseId,
+          position: index + 1,
+        })),
+      });
+    }
+  });
+
+  return prisma.routines.findUnique({
+    where: { id: existingRoutine.id },
+    include: {
+      routine_exercises: {
+        include: {
+          exercises: true,
+        },
+        orderBy: {
+          position: "asc",
+        },
+      },
+    },
   });
 };

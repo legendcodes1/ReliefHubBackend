@@ -2,10 +2,21 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { saveExercise } from '../saved-exercises/savedExercisesApi'
 import type { Exercise } from './recommendationTypes'
+import type { ReactionType } from './reactionsApi'
 import { getYouTubeThumbnailUrl } from './youtube'
+
+type ReactionCounts = {
+  like: number
+  dislike: number
+}
 
 type ExerciseCardProps = {
   exercise: Exercise
+  reactions?: {
+    counts: ReactionCounts
+    userReaction: ReactionType | null
+  }
+  onReactionsChange?: (exerciseId: string, update: Partial<{ counts: ReactionCounts; userReaction: ReactionType | null }>) => void
 }
 
 const accentStyles = [
@@ -58,11 +69,41 @@ function PlayIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
   )
 }
 
-export function ExerciseCard({ exercise }: ExerciseCardProps) {
+export function ExerciseCard({ exercise, reactions, onReactionsChange }: ExerciseCardProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
   const accent = accentStyles[getAccentIndex(exercise.id)]
   const thumbnailUrl = getYouTubeThumbnailUrl(exercise.video_url)
+
+  const counts = reactions?.counts ?? { like: 0, dislike: 0 }
+  const userReaction = reactions?.userReaction ?? null
+
+  async function handleReaction(type: ReactionType) {
+    if (!onReactionsChange) return
+
+    const isTogglingOff = userReaction === type
+
+    onReactionsChange(exercise.id, {
+      counts: isTogglingOff
+        ? { ...counts, [type]: Math.max(0, counts[type] - 1) }
+        : {
+            ...counts,
+            [type]: counts[type] + 1,
+            ...(userReaction ? { [userReaction]: Math.max(0, counts[userReaction] - 1) } : {}),
+          },
+      userReaction: isTogglingOff ? null : type,
+    })
+
+    try {
+      if (isTogglingOff) {
+        await import('./reactionsApi').then(m => m.removeReaction(exercise.id))
+      } else {
+        await import('./reactionsApi').then(m => m.setReaction(exercise.id, type))
+      }
+    } catch {
+      onReactionsChange(exercise.id, reactions ?? { counts: { like: 0, dislike: 0 }, userReaction: null })
+    }
+  }
 
   async function handleSave() {
     setIsSaving(true)
@@ -144,7 +185,36 @@ export function ExerciseCard({ exercise }: ExerciseCardProps) {
         </div>
       )}
 
-      <div className="mt-auto flex items-center gap-2 pt-4">
+      <div className="mt-4 flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => handleReaction('like')}
+          title="Like"
+          className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm transition ${
+            userReaction === 'like'
+              ? 'bg-emerald-100 text-emerald-700'
+              : 'text-stone-500 hover:bg-stone-100'
+          }`}
+        >
+          <span>👍</span>
+          <span className="text-xs font-medium tabular-nums">{counts.like}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => handleReaction('dislike')}
+          title="Dislike"
+          className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm transition ${
+            userReaction === 'dislike'
+              ? 'bg-rose-100 text-rose-700'
+              : 'text-stone-500 hover:bg-stone-100'
+          }`}
+        >
+          <span>👎</span>
+          <span className="text-xs font-medium tabular-nums">{counts.dislike}</span>
+        </button>
+      </div>
+
+      <div className="mt-auto flex items-center gap-2 pt-3">
         <Link to={`/exercises/${exercise.id}`} className="rounded-xl border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-medium text-[color:var(--text-strong)] transition hover:bg-[color:var(--bg-soft)]">
           View Details
         </Link>
