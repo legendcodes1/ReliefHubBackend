@@ -14,7 +14,7 @@ const app = express();
 
 const allowedOrigins = [
   env.frontendUrl,
-  "http://192.168.1.238:5173/",
+  "http://192.168.1.79:5173",
 ];
 
 app.use(
