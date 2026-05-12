@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 
 import exerciseRouter from "./routes/exerciseRoute.js";
+import exerciseReactionRouter from "./routes/exerciseReactionRoute.js";
 import discomfortRouter from "./routes/discomfortRoute.js";
 import bodyPartRouter from "./routes/bodyPartRoute.js";
 import savedExerciseRouter from "./routes/savedExerciseRoute.js";
@@ -32,6 +33,7 @@ app.get("/", (_req, res) => {
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/exercises", exerciseRouter);
+app.use("/api/v1/exercise-reactions", exerciseReactionRouter);
 app.use("/api/v1/body-parts", bodyPartRouter);
 app.use("/api/v1/discomfort-types", discomfortRouter);
 app.use("/api/v1/saved-exercises", savedExerciseRouter);

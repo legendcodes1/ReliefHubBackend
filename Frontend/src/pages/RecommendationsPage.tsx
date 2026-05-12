@@ -4,8 +4,20 @@ import { useSearchParams } from 'react-router-dom'
 import { ChevronUp, ChevronDown } from 'lucide-react'
 import { ExerciseCard } from '../features/recommendations/ExerciseCard'
 import { getRecommendations } from '../features/recommendations/recommendationsApi'
+import { getBatchReactions } from '../features/recommendations/reactionsApi'
 import type { Exercise } from '../features/recommendations/recommendationTypes'
+import type { ReactionType } from '../features/recommendations/reactionsApi'
 import RoutinePage from './RoutinePage'
+
+type ReactionCounts = {
+  like: number
+  dislike: number
+}
+
+type ReactionData = {
+  counts: ReactionCounts
+  userReaction: ReactionType | null
+}
 
 export function RecommendationsPage() {
   const [searchParams] = useSearchParams()
@@ -15,6 +27,8 @@ export function RecommendationsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [isRoutineExpanded, setIsRoutineExpanded] = useState(false)
+  const [reactions, setReactions] = useState<Record<string, ReactionData>>({})
+
   const hasFilters = Boolean(bodyPartId && discomfortTypeId)
   const recommendationsCount = exercises.length
 
@@ -40,6 +54,17 @@ export function RecommendationsPage() {
     }
 
     return `${recommendationsCount} recommendations found`
+  }
+
+  function handleReactionsChange(exerciseId: string, update: Partial<ReactionData>) {
+    setReactions(prev => ({
+      ...prev,
+      [exerciseId]: {
+        counts: prev[exerciseId]?.counts ?? { like: 0, dislike: 0 },
+        userReaction: prev[exerciseId]?.userReaction ?? null,
+        ...update,
+      },
+    }))
   }
 
   useEffect(() => {
@@ -83,6 +108,31 @@ export function RecommendationsPage() {
       isMounted = false
     }
   }, [bodyPartId, discomfortTypeId, hasFilters])
+
+  useEffect(() => {
+    if (!exercises.length) return
+
+    let isMounted = true
+
+    async function loadReactions() {
+      try {
+        const exerciseIds = exercises.map(e => e.id)
+        const result = await getBatchReactions(exerciseIds)
+
+        if (isMounted) {
+          setReactions(result.data)
+        }
+      } catch {
+        // silently fail — reactions are optional
+      }
+    }
+
+    loadReactions()
+
+    return () => {
+      isMounted = false
+    }
+  }, [exercises])
 
   return (
     <main className="space-y-5">
@@ -143,7 +193,12 @@ export function RecommendationsPage() {
         <section className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-sm sm:p-6">
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {exercises.map((exercise) => (
-              <ExerciseCard key={exercise.id} exercise={exercise} />
+              <ExerciseCard
+                key={exercise.id}
+                exercise={exercise}
+                reactions={reactions[exercise.id]}
+                onReactionsChange={handleReactionsChange}
+              />
             ))}
           </div>
         </section>
