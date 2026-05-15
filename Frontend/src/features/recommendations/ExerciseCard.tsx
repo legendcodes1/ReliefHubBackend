@@ -178,22 +178,17 @@ export function ExerciseCard({ exercise, reactions, onReactionsChange }: Exercis
         )}
       </div>
 
-      {exercise.safety_notes && (
-        <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-800">Safety Note</p>
-          <p className="mt-1 text-xs text-amber-900">{exercise.safety_notes}</p>
-        </div>
-      )}
-
-      <div className="mt-4 flex items-center gap-1">
+      <div className="mt-4 inline-flex items-center gap-1 rounded-full border border-[color:var(--line)] bg-white/90 p-1 shadow-sm">
         <button
           type="button"
           onClick={() => handleReaction('like')}
           title="Like"
-          className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm transition ${
+          aria-label="Like exercise"
+          aria-pressed={userReaction === 'like'}
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition duration-200 ${
             userReaction === 'like'
-              ? 'bg-emerald-100 text-emerald-700'
-              : 'text-stone-500 hover:bg-stone-100'
+              ? 'bg-emerald-100 text-emerald-800 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.25)]'
+              : 'text-stone-600 hover:-translate-y-0.5 hover:bg-emerald-50 hover:text-emerald-800 hover:shadow-[inset_0_0_0_1px_rgba(16,185,129,0.25)]'
           }`}
         >
           <span>👍</span>
@@ -203,10 +198,12 @@ export function ExerciseCard({ exercise, reactions, onReactionsChange }: Exercis
           type="button"
           onClick={() => handleReaction('dislike')}
           title="Dislike"
-          className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm transition ${
+          aria-label="Dislike exercise"
+          aria-pressed={userReaction === 'dislike'}
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition duration-200 ${
             userReaction === 'dislike'
-              ? 'bg-rose-100 text-rose-700'
-              : 'text-stone-500 hover:bg-stone-100'
+              ? 'bg-rose-100 text-rose-800 shadow-[inset_0_0_0_1px_rgba(244,63,94,0.25)]'
+              : 'text-stone-600 hover:-translate-y-0.5 hover:bg-rose-50 hover:text-rose-800 hover:shadow-[inset_0_0_0_1px_rgba(244,63,94,0.25)]'
           }`}
         >
           <span>👎</span>

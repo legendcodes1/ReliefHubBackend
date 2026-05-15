@@ -41,6 +41,9 @@ export function TopNav() {
           <NavLink to="/my-routines" className={navLinkClass}>
             My Routines
           </NavLink>
+          <NavLink to="/community-routines" className={navLinkClass}>
+            Community
+          </NavLink>
           <NavLink to="/account" className={navLinkClass}>
             Account
           </NavLink>

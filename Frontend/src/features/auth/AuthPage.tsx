@@ -41,17 +41,14 @@ export function AuthPage() {
           </p>
 
           <div className="mt-5 grid gap-3">
-            <div className="rounded-xl border border-[color:var(--line)] bg-white/80 p-3">
-              <p className="text-sm font-semibold text-[color:var(--text-strong)]">Guided, not diagnostic</p>
-              <p className="mt-1 text-sm text-[color:var(--text-soft)]">Get movement suggestions and safety notes, not medical diagnosis.</p>
+            <div className="rounded-xl border border-[color:var(--line)] bg-white/80 p-4">
+              <p className="text-base font-bold text-[color:var(--text-strong)] sm:text-lg">Guided, not diagnostic</p>
             </div>
-            <div className="rounded-xl border border-[color:var(--line)] bg-white/80 p-3">
-              <p className="text-sm font-semibold text-[color:var(--text-strong)]">Personalized flow</p>
-              <p className="mt-1 text-sm text-[color:var(--text-soft)]">Choose body part, choose discomfort, and review matched routines.</p>
+            <div className="rounded-xl border border-[color:var(--line)] bg-white/80 p-4">
+              <p className="text-base font-bold text-[color:var(--text-strong)] sm:text-lg">Personalized flow</p>
             </div>
-            <div className="rounded-xl border border-[color:var(--line)] bg-white/80 p-3">
-              <p className="text-sm font-semibold text-[color:var(--text-strong)]">Save and revisit</p>
-              <p className="mt-1 text-sm text-[color:var(--text-soft)]">Keep useful exercises in one place for consistent follow-through.</p>
+            <div className="rounded-xl border border-[color:var(--line)] bg-white/80 p-4">
+              <p className="text-base font-bold text-[color:var(--text-strong)] sm:text-lg">Save and revisit</p>
             </div>
           </div>
         </section>

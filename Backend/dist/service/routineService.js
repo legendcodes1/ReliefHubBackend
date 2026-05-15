@@ -52,8 +52,35 @@ export const getRoutineService = async (authUserId, id) => {
         },
     });
 };
+export const getPublicRoutinesService = async () => {
+    return prisma.routines.findMany({
+        where: {
+            is_public: true,
+        },
+        include: {
+            users: {
+                select: {
+                    id: true,
+                    username: true,
+                    email: true,
+                },
+            },
+            routine_exercises: {
+                include: {
+                    exercises: true,
+                },
+                orderBy: {
+                    position: "asc",
+                },
+            },
+        },
+        orderBy: {
+            created_at: "desc",
+        },
+    });
+};
 export const createRoutineService = async (data) => {
-    const { userId, name, exerciseIds } = data;
+    const { userId, name, exerciseIds, isPublic } = data;
     const publicUser = await getPublicUserByAuthId(userId);
     if (!publicUser) {
         throw new RoutineServiceError("User not found", 404);
@@ -74,6 +101,7 @@ export const createRoutineService = async (data) => {
             data: {
                 user_id: publicUser.id,
                 name: name.trim(),
+                is_public: isPublic ?? false,
             },
         });
         await tx.routine_exercises.createMany({
@@ -118,5 +146,66 @@ export const deleteRoutineService = async (authUserId, routineId) => {
     }
     return prisma.routines.delete({
         where: { id: existingRoutine.id },
+    });
+};
+export const updateRoutineService = async (data) => {
+    const { userId, routineId, name, exerciseIds, isPublic } = data;
+    const publicUser = await getPublicUserByAuthId(userId);
+    if (!publicUser) {
+        throw new RoutineServiceError("User not found", 404);
+    }
+    const existingRoutine = await prisma.routines.findFirst({
+        where: {
+            id: routineId,
+            user_id: publicUser.id,
+        },
+    });
+    if (!existingRoutine) {
+        throw new RoutineServiceError("Routine not found", 404);
+    }
+    const duplicateIds = new Set();
+    const seen = new Set();
+    for (const exerciseId of exerciseIds) {
+        if (seen.has(exerciseId)) {
+            duplicateIds.add(exerciseId);
+        }
+        seen.add(exerciseId);
+    }
+    if (duplicateIds.size > 0) {
+        throw new RoutineServiceError("Duplicate exercise IDs are not allowed in a routine", 400);
+    }
+    await prisma.$transaction(async (tx) => {
+        await tx.routines.update({
+            where: { id: existingRoutine.id },
+            data: {
+                name: name.trim(),
+                ...(typeof isPublic === "boolean" ? { is_public: isPublic } : {}),
+            },
+        });
+        await tx.routine_exercises.deleteMany({
+            where: { routine_id: existingRoutine.id },
+        });
+        if (exerciseIds.length > 0) {
+            await tx.routine_exercises.createMany({
+                data: exerciseIds.map((exerciseId, index) => ({
+                    routine_id: existingRoutine.id,
+                    exercise_id: exerciseId,
+                    position: index + 1,
+                })),
+            });
+        }
+    });
+    return prisma.routines.findUnique({
+        where: { id: existingRoutine.id },
+        include: {
+            routine_exercises: {
+                include: {
+                    exercises: true,
+                },
+                orderBy: {
+                    position: "asc",
+                },
+            },
+        },
     });
 };

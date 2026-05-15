@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ExerciseVideo } from '../features/recommendations/ExerciseVideo'
 import { getExerciseById } from '../features/recommendations/recommendationsApi'
 import type { Exercise } from '../features/recommendations/recommendationTypes'
+import { getReaction } from '../features/recommendations/reactionsApi'
+import type { ExerciseReactionResponse } from '../features/recommendations/reactionsApi'
+import { ExerciseReactionControls } from '../features/recommendations/ExerciseReactionControls'
 
 export function ExerciseDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [exercise, setExercise] = useState<Exercise | null>(null)
+  const [reaction, setReaction] = useState<ExerciseReactionResponse | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(id ? '' : 'Exercise id is missing.')
 
@@ -29,8 +34,11 @@ export function ExerciseDetailPage() {
           throw new Error('Unable to fetch exercise')
         }
 
+        const reactionResult = await getReaction(exerciseId!)
+
         if (isMounted) {
           setExercise(result.data)
+          setReaction(reactionResult.data)
         }
       } catch {
         if (isMounted) {
@@ -50,9 +58,24 @@ export function ExerciseDetailPage() {
     }
   }, [id])
 
+  function handleReactionChange(_exerciseId: string, update: Partial<ExerciseReactionResponse>) {
+    setReaction(prev => ({
+      counts: prev?.counts ?? { like: 0, dislike: 0 },
+      userReaction: prev?.userReaction ?? null,
+      ...update,
+    }))
+  }
+
   return (
     <main className="space-y-5">
       <section className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-6 sm:p-7">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center rounded-xl border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-medium text-[color:var(--text-strong)] transition hover:bg-[color:var(--bg-soft)]"
+        >
+          Back
+        </button>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--accent)]">Exercise Guidance</p>
         <h1 className="mt-2 text-4xl font-semibold leading-tight text-[color:var(--text-strong)]">Exercise Detail</h1>
         <p className="mt-2 text-sm text-[color:var(--text-soft)]">Review the movement details and complete each step gently.</p>
@@ -90,6 +113,12 @@ export function ExerciseDetailPage() {
                 </span>
               )}
             </div>
+
+            <ExerciseReactionControls
+              exerciseId={exercise.id}
+              reactions={reaction}
+              onReactionsChange={handleReactionChange}
+            />
 
               {exercise.safety_notes && <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">Safety: {exercise.safety_notes}</p>}
 

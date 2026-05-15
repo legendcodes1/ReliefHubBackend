@@ -28,3 +28,9 @@ export async function logoutUser() {
     withAuth: true,
   })
 }
+
+export async function refreshSession() {
+  return requestJson<AuthResponse>('/api/v1/auth/refresh', {
+    method: 'POST',
+  })
+}

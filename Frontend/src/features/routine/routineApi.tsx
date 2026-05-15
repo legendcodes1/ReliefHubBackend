@@ -1,5 +1,5 @@
 import { requestJson } from '../../lib/apiClient'
-import type { Routine, RoutineWithExercises } from './routineTypes'
+import type { PublicRoutine, Routine, RoutineWithExercises } from './routineTypes'
 
 export async function getRoutines() {
   return requestJson<Routine[]>('/api/v1/routines', {
@@ -13,11 +13,11 @@ export async function getRoutineById(id: string) {
   })
 }
 
-export async function createRoutine(name: string, exerciseIds: string[]) {
+export async function createRoutine(name: string, exerciseIds: string[], isPublic = false) {
   return requestJson<Routine>('/api/v1/routines', {
     withAuth: true,
     method: 'POST',
-    body: { name, exercise_ids: exerciseIds },
+    body: { name, exercise_ids: exerciseIds, is_public: isPublic },
   })
 }
 
@@ -28,10 +28,20 @@ export async function deleteRoutine(id: string) {
   })
 }
 
-export async function updateRoutine(id: string, name: string, exerciseIds: string[]) {
+export async function updateRoutine(id: string, name: string, exerciseIds: string[], isPublic?: boolean) {
   return requestJson<Routine>(`/api/v1/routines/${id}`, {
     withAuth: true,
     method: 'PUT',
-    body: { name, exercise_ids: exerciseIds },
+    body: {
+      name,
+      exercise_ids: exerciseIds,
+      ...(typeof isPublic === 'boolean' ? { is_public: isPublic } : {}),
+    },
+  })
+}
+
+export async function getPublicRoutines() {
+  return requestJson<PublicRoutine[]>('/api/v1/routines/public', {
+    withAuth: true,
   })
 }

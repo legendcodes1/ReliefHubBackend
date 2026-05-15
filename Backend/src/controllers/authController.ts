@@ -1,7 +1,33 @@
-import type { Request, Response } from "express";
+import type { CookieOptions, Request, Response } from "express";
 
-import { supabase } from "../config/supabase.js";
+import { env } from "../config/env.js";
+import { supabase, supabaseAdmin } from "../config/supabase.js";
 import type { LoginInput, SignupInput } from "../validators/authSchema.js";
+
+const REFRESH_TOKEN_COOKIE_NAME = "rh_refresh_token";
+
+function getRefreshCookieOptions(): CookieOptions {
+  const isProduction = env.nodeEnv === "production";
+
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    path: "/api/v1/auth",
+    maxAge: 1000 * 60 * 60 * 24 * 30,
+  };
+}
+
+function setRefreshTokenCookie(res: Response, refreshToken: string) {
+  res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, getRefreshCookieOptions());
+}
+
+function clearRefreshTokenCookie(res: Response) {
+  res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
+    ...getRefreshCookieOptions(),
+    maxAge: undefined,
+  });
+}
 
 function extractBearerToken(authorization?: string) {
   if (!authorization || !authorization.startsWith("Bearer ")) {
@@ -12,7 +38,7 @@ function extractBearerToken(authorization?: string) {
   return token || null;
 }
 
-function mapAuthPayload(user: { id: string; email?: string | null }, session?: { access_token: string; refresh_token: string } | null) {
+function mapAuthPayload(user: { id: string; email?: string | null }, session?: { access_token: string } | null) {
   return {
     user: {
       id: user.id,
@@ -21,7 +47,6 @@ function mapAuthPayload(user: { id: string; email?: string | null }, session?: {
     session: session
       ? {
           accessToken: session.access_token,
-          refreshToken: session.refresh_token,
         }
       : null,
   };
@@ -49,6 +74,10 @@ export async function signup(req: Request<unknown, unknown, SignupInput>, res: R
 
   const payload = mapAuthPayload(data.user, data.session);
 
+  if (data.session?.refresh_token) {
+    setRefreshTokenCookie(res, data.session.refresh_token);
+  }
+
   const message = data.session
     ? "Signup successful"
     : "Signup successful. Please verify your email before logging in.";
@@ -73,6 +102,8 @@ export async function login(req: Request<unknown, unknown, LoginInput>, res: Res
     });
   }
 
+  setRefreshTokenCookie(res, data.session.refresh_token);
+
   return res.status(200).json({
     message: "Login successful",
     ...mapAuthPayload(data.user, data.session),
@@ -80,24 +111,45 @@ export async function login(req: Request<unknown, unknown, LoginInput>, res: Res
 }
 
 export async function logout(req: Request, res: Response) {
+  clearRefreshTokenCookie(res);
+
   const token = extractBearerToken(req.headers.authorization);
 
-  if (!token) {
-    return res.status(401).json({
-      message: "Authorization token is required",
-    });
-  }
-
-  const { error } = await supabase.auth.admin.signOut(token, "global");
-
-  if (error) {
-    return res.status(500).json({
-      message: "Unable to revoke session",
-    });
+  if (token) {
+    await supabaseAdmin.auth.admin.signOut(token, "global");
   }
 
   return res.status(200).json({
     message: "Logged out successfully and session revoked",
+  });
+}
+
+export async function refreshSession(req: Request, res: Response) {
+  const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
+
+  if (!refreshToken) {
+    clearRefreshTokenCookie(res);
+    return res.status(401).json({
+      message: "Refresh token is required",
+    });
+  }
+
+  const { data, error } = await supabase.auth.refreshSession({
+    refresh_token: refreshToken,
+  });
+
+  if (error || !data.user || !data.session?.refresh_token) {
+    clearRefreshTokenCookie(res);
+    return res.status(401).json({
+      message: "Invalid or expired refresh token",
+    });
+  }
+
+  setRefreshTokenCookie(res, data.session.refresh_token);
+
+  return res.status(200).json({
+    message: "Session refreshed",
+    ...mapAuthPayload(data.user, data.session),
   });
 }
 

@@ -33,6 +33,7 @@ export default function RoutinePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [routineName, setRoutineName] = useState('')
+  const [isPublic, setIsPublic] = useState(false)
   const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
@@ -141,7 +142,7 @@ export default function RoutinePage() {
 
     try {
       const exerciseIds = selectedExercises.map((e) => e.id)
-      const result = await createRoutine(routineName.trim(), exerciseIds)
+      const result = await createRoutine(routineName.trim(), exerciseIds, isPublic)
 
       if (!result.response.ok) {
         throw new Error('Unable to save routine')
@@ -149,6 +150,7 @@ export default function RoutinePage() {
 
       setSuccessMessage('Routine saved successfully!')
       setRoutineName('')
+      setIsPublic(false)
       setSelectedExercises([])
 
       setTimeout(() => {
@@ -324,6 +326,19 @@ export default function RoutinePage() {
                 className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-slate-900 placeholder-slate-400 transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
               />
             </div>
+
+            <label className="mt-4 flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+              <input
+                type="checkbox"
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+              />
+              <span>
+                <span className="block text-sm font-medium text-slate-800">Share publicly</span>
+                <span className="mt-0.5 block text-xs text-slate-500">Allow other ReliefHub users to view this routine.</span>
+              </span>
+            </label>
 
             {selectedExercises.length === 0 ? (
               <div className="mt-6 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 py-10 text-center">

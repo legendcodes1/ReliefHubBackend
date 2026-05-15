@@ -2,17 +2,6 @@ import type { NextFunction, Request, Response } from "express";
 
 import { supabase } from "../config/supabase.js";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string
-        email?: string
-      }
-    }
-  }
-}
-
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
   const authorization = req.headers.authorization;
 

@@ -3,7 +3,11 @@ import { Navigate } from 'react-router-dom'
 import { useAuthContext } from '../features/auth/AuthContext'
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuthContext()
+  const { isAuthLoading, isAuthenticated } = useAuthContext()
+
+  if (isAuthLoading) {
+    return <p className="p-4 text-sm text-[color:var(--text-soft)]">Checking session...</p>
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
@@ -13,7 +17,11 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 }
 
 export function PublicOnlyRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuthContext()
+  const { isAuthLoading, isAuthenticated } = useAuthContext()
+
+  if (isAuthLoading) {
+    return <p className="p-4 text-sm text-[color:var(--text-soft)]">Checking session...</p>
+  }
 
   if (isAuthenticated) {
     return <Navigate to="/home" replace />

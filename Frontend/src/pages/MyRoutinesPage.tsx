@@ -126,9 +126,20 @@ export function MyRoutinesPage() {
                 className="flex h-full flex-col rounded-2xl border border-[color:var(--line)] bg-[color:var(--bg-soft)] p-4 shadow-sm cursor-pointer transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <div className="mb-3 flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
-                    Routine
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
+                      Routine
+                    </span>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                        routine.is_public
+                          ? 'border border-cyan-200 bg-cyan-50 text-cyan-800'
+                          : 'border border-stone-200 bg-stone-50 text-stone-700'
+                      }`}
+                    >
+                      {routine.is_public ? 'Public' : 'Private'}
+                    </span>
+                  </div>
                   <span className="text-[11px] text-[color:var(--text-soft)]">
                     {routine.routine_exercises.length} exercises
                   </span>
@@ -184,13 +195,14 @@ export function MyRoutinesPage() {
         <RoutineEditModal
           routineId={editingRoutine.id}
           initialName={editingRoutine.name}
+          initialIsPublic={editingRoutine.is_public}
           initialExercises={editingRoutine.routine_exercises}
           onClose={() => setEditingRoutine(null)}
-          onSave={({ name, exercises }) => {
+          onSave={({ name, exercises, isPublic }) => {
             setRoutines((prev) =>
               prev.map((r) =>
                 r.id === editingRoutine.id
-                  ? { ...r, name, routine_exercises: exercises }
+                  ? { ...r, name, is_public: isPublic, routine_exercises: exercises }
                   : r
               )
             )

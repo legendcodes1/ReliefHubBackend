@@ -29,13 +29,15 @@ function getBodyPartName(exercise: Exercise): string {
 interface RoutineEditModalProps {
   routineId: string
   initialName: string
+  initialIsPublic: boolean
   initialExercises: RoutineExercise[]
   onClose: () => void
-  onSave: (updatedRoutine: { name: string; exercises: RoutineExercise[] }) => void
+  onSave: (updatedRoutine: { name: string; exercises: RoutineExercise[]; isPublic: boolean }) => void
 }
 
-export function RoutineEditModal({ routineId, initialName, initialExercises, onClose, onSave }: RoutineEditModalProps) {
+export function RoutineEditModal({ routineId, initialName, initialIsPublic, initialExercises, onClose, onSave }: RoutineEditModalProps) {
   const [name, setName] = useState(initialName)
+  const [isPublic, setIsPublic] = useState(initialIsPublic)
   const [exercises, setExercises] = useState<RoutineExercise[]>(initialExercises)
   const [allExercises, setAllExercises] = useState<Exercise[]>([])
   const [isLoadingExercises, setIsLoadingExercises] = useState(false)
@@ -135,7 +137,7 @@ export function RoutineEditModal({ routineId, initialName, initialExercises, onC
 
     try {
       const exerciseIds = exercises.map((e) => e.exercise_id)
-      const result = await updateRoutine(routineId, name.trim(), exerciseIds)
+      const result = await updateRoutine(routineId, name.trim(), exerciseIds, isPublic)
 
       if (!result.response.ok) {
         throw new Error('Failed to update routine')
@@ -144,6 +146,7 @@ export function RoutineEditModal({ routineId, initialName, initialExercises, onC
       onSave({
         name: result.data.name,
         exercises: result.data.routine_exercises,
+        isPublic: result.data.is_public,
       })
       onClose()
     } catch {
@@ -188,6 +191,19 @@ export function RoutineEditModal({ routineId, initialName, initialExercises, onC
                 className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
+
+            <label className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+              <input
+                type="checkbox"
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+              />
+              <span>
+                <span className="block text-sm font-medium text-slate-800">Share publicly</span>
+                <span className="mt-0.5 block text-xs text-slate-500">Allow other ReliefHub users to view this routine.</span>
+              </span>
+            </label>
 
             <div>
               <div className="flex items-center justify-between">

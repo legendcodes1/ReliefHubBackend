@@ -42,7 +42,12 @@ export const removeReactionController = async (req: Request, res: Response) => {
     const userId = req.user?.id
     if (!userId) return res.status(401).json({ message: 'Unauthorized' })
 
-    const result = await removeReaction(userId, req.params.exerciseId)
+    const exerciseId = req.params.exerciseId
+    if (typeof exerciseId !== 'string' || !exerciseId.trim()) {
+      return res.status(400).json({ message: 'exerciseId route parameter is required' })
+    }
+
+    const result = await removeReaction(userId, exerciseId)
     return res.status(200).json(result)
   } catch (error) {
     return handleReactionError(error, res)
@@ -54,7 +59,12 @@ export const getReactionController = async (req: Request, res: Response) => {
     const userId = req.user?.id
     if (!userId) return res.status(401).json({ message: 'Unauthorized' })
 
-    const result = await getReactionData(userId, req.params.exerciseId)
+    const exerciseId = req.params.exerciseId
+    if (typeof exerciseId !== 'string' || !exerciseId.trim()) {
+      return res.status(400).json({ message: 'exerciseId route parameter is required' })
+    }
+
+    const result = await getReactionData(userId, exerciseId)
     return res.status(200).json(result)
   } catch (error) {
     return handleReactionError(error, res)
@@ -66,9 +76,9 @@ export const getBatchReactionsController = async (req: Request, res: Response) =
     const userId = req.user?.id
     if (!userId) return res.status(401).json({ message: 'Unauthorized' })
 
-    const ids = req.query.ids as string | undefined
-    if (!ids) {
-      return res.status(400).json({ message: 'ids query parameter is required' })
+    const ids = req.query.ids
+    if (typeof ids !== 'string') {
+      return res.status(400).json({ message: 'ids query parameter must be a comma-separated string' })
     }
 
     const exerciseIds = ids.split(',').map(id => id.trim()).filter(Boolean)

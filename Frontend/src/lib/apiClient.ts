@@ -1,4 +1,4 @@
-import { getAccessToken } from './tokenStorage'
+import { clearAuthSession, getAccessToken, saveAuthSession } from './tokenStorage'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000'
 type RequestOptions = {
@@ -13,7 +13,33 @@ type ApiClientResult<T> = {
   data: T
 }
 
-export async function requestJson<T>(path: string, options: RequestOptions = {}): Promise<ApiClientResult<T>> {
+type AuthRefreshResponse = {
+  session?: {
+    accessToken: string
+  } | null
+}
+
+async function refreshAccessToken() {
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  const data = (await response.json().catch(() => ({}))) as AuthRefreshResponse
+
+  if (!response.ok || !data.session?.accessToken) {
+    clearAuthSession()
+    return false
+  }
+
+  saveAuthSession({ accessToken: data.session.accessToken })
+  return true
+}
+
+export async function requestJson<T>(path: string, options: RequestOptions = {}, hasRetried = false): Promise<ApiClientResult<T>> {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   }
@@ -40,7 +66,15 @@ export async function requestJson<T>(path: string, options: RequestOptions = {})
     method: options.method ?? 'GET',
     headers,
     body: options.body ? JSON.stringify(options.body) : undefined,
+    credentials: 'include',
   })
+
+  if (options.withAuth && response.status === 401 && !hasRetried && path !== '/api/v1/auth/refresh') {
+    const refreshed = await refreshAccessToken()
+    if (refreshed) {
+      return requestJson<T>(path, options, true)
+    }
+  }
 
   const data = (await response.json().catch(() => ({}))) as T
 

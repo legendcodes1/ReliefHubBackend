@@ -5,6 +5,7 @@ import { AuthPage } from './features/auth/AuthPage'
 import { AccountPage } from './pages/AccountPage'
 import { ExerciseDetailPage } from './pages/ExerciseDetailPage'
 import { HomePage } from './pages/HomePage'
+import { CommunityRoutinesPage } from './pages/CommunityRoutinesPage'
 import { RecommendationsPage } from './pages/RecommendationsPage'
 import { SavedExercisesPage } from './pages/SavedExercisesPage'
 import RoutinePage from './pages/RoutinePage'
@@ -86,6 +87,16 @@ function App() {
           <ProtectedRoute>
             <AppLayout>
               <MyRoutinesPage />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/community-routines"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <CommunityRoutinesPage />
             </AppLayout>
           </ProtectedRoute>
         }

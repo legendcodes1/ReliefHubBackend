@@ -4,6 +4,7 @@ interface CreateRoutineInput {
   userId: string;
   name: string;
   exerciseIds: string[];
+  isPublic?: boolean;
 }
 
 interface UpdateRoutineInput {
@@ -11,6 +12,7 @@ interface UpdateRoutineInput {
   routineId: string;
   name: string;
   exerciseIds: string[];
+  isPublic?: boolean;
 }
 
 export class RoutineServiceError extends Error {
@@ -75,8 +77,36 @@ export const getRoutineService = async (authUserId: string, id: string) => {
   });
 };
 
+export const getPublicRoutinesService = async () => {
+  return prisma.routines.findMany({
+    where: {
+      is_public: true,
+    },
+    include: {
+      users: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
+      routine_exercises: {
+        include: {
+          exercises: true,
+        },
+        orderBy: {
+          position: "asc",
+        },
+      },
+    },
+    orderBy: {
+      created_at: "desc",
+    },
+  });
+};
+
 export const createRoutineService = async (data: CreateRoutineInput) => {
-  const { userId, name, exerciseIds } = data;
+  const { userId, name, exerciseIds, isPublic } = data;
 
   const publicUser = await getPublicUserByAuthId(userId);
 
@@ -103,6 +133,7 @@ export const createRoutineService = async (data: CreateRoutineInput) => {
       data: {
         user_id: publicUser.id,
         name: name.trim(),
+        is_public: isPublic ?? false,
       },
     });
 
@@ -160,7 +191,7 @@ export const deleteRoutineService = async (authUserId: string, routineId: string
 };
 
 export const updateRoutineService = async (data: UpdateRoutineInput) => {
-  const { userId, routineId, name, exerciseIds } = data;
+  const { userId, routineId, name, exerciseIds, isPublic } = data;
 
   const publicUser = await getPublicUserByAuthId(userId);
 
@@ -196,7 +227,10 @@ export const updateRoutineService = async (data: UpdateRoutineInput) => {
   await prisma.$transaction(async (tx) => {
     await tx.routines.update({
       where: { id: existingRoutine.id },
-      data: { name: name.trim() },
+      data: {
+        name: name.trim(),
+        ...(typeof isPublic === "boolean" ? { is_public: isPublic } : {}),
+      },
     });
 
     await tx.routine_exercises.deleteMany({

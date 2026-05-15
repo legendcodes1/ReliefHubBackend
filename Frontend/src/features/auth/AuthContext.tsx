@@ -1,10 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useMemo, useState } from 'react'
+import { useEffect } from 'react'
 import type { ReactNode } from 'react'
-import { clearAuthSession, getAccessToken } from '../../lib/tokenStorage'
+import { clearAuthSession, saveAuthSession } from '../../lib/tokenStorage'
+import { refreshSession } from './authApi'
 import type { AuthUser } from './authTypes'
 
 type AuthContextValue = {
+  isAuthLoading: boolean
   isAuthenticated: boolean
   currentUser: AuthUser | null
   login: (user: AuthUser) => void
@@ -15,10 +18,51 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(getAccessToken()))
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthLoading, setIsAuthLoading] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function bootstrapAuth() {
+      try {
+        const { response, data } = await refreshSession()
+
+        if (!isMounted) {
+          return
+        }
+
+        if (response.ok && data.session?.accessToken && data.user) {
+          saveAuthSession({ accessToken: data.session.accessToken })
+          setCurrentUser(data.user)
+          setIsAuthenticated(true)
+          return
+        }
+      } catch {
+        // leave user signed out
+      }
+
+      if (isMounted) {
+        clearAuthSession()
+        setCurrentUser(null)
+        setIsAuthenticated(false)
+      }
+    }
+
+    bootstrapAuth().finally(() => {
+      if (isMounted) {
+        setIsAuthLoading(false)
+      }
+    })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const value = useMemo<AuthContextValue>(
     () => ({
+      isAuthLoading,
       isAuthenticated,
       currentUser,
       login: (user) => {
@@ -31,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAuthenticated(false)
       },
     }),
-    [currentUser, isAuthenticated],
+    [currentUser, isAuthLoading, isAuthenticated],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
