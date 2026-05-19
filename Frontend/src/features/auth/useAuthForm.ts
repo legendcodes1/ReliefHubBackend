@@ -9,6 +9,7 @@ export function useAuthForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
+  const [shouldRedirectToLogin, setShouldRedirectToLogin] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -17,6 +18,7 @@ export function useAuthForm() {
     event.preventDefault()
     setError('')
     setSuccess('')
+    setShouldRedirectToLogin(false)
     setIsLoading(true)
 
     try {
@@ -29,11 +31,26 @@ export function useAuthForm() {
 
       if (result.data.session) {
         saveAuthSession(result.data.session)
+        setCurrentUser(result.data.user)
+        setSuccess(result.data.message ?? 'You are signed in.')
+        setPassword('')
+        return
       }
 
-      setCurrentUser(result.data.user)
-      setSuccess(result.data.message ?? 'You are signed in.')
+      const requiresEmailConfirmation = mode === 'signup'
+      setSuccess(
+        result.data.message ??
+          (requiresEmailConfirmation
+            ? 'Signup successful. Please verify your email before logging in. Redirecting to login...'
+            : 'Authentication successful.'),
+      )
       setPassword('')
+
+      if (requiresEmailConfirmation) {
+        clearAuthSession()
+        setCurrentUser(null)
+        setShouldRedirectToLogin(true)
+      }
     } catch {
       setError('Cannot connect to API. Check backend server and CORS settings.')
     } finally {
@@ -47,6 +64,7 @@ export function useAuthForm() {
     setSuccess('Logged out successfully.')
     setError('')
     setMode('login')
+    setShouldRedirectToLogin(false)
   }
 
   return {
@@ -60,6 +78,8 @@ export function useAuthForm() {
     isLoading,
     error,
     success,
+    shouldRedirectToLogin,
+    setShouldRedirectToLogin,
     handleAuthSubmit,
     handleLogout,
   }

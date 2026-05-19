@@ -10,7 +10,21 @@ export function AuthPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const { login } = useAuthContext()
-  const { mode, setMode, email, setEmail, password, setPassword, currentUser, isLoading, error, success, handleAuthSubmit } = useAuthForm()
+  const {
+    mode,
+    setMode,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    currentUser,
+    isLoading,
+    error,
+    success,
+    shouldRedirectToLogin,
+    setShouldRedirectToLogin,
+    handleAuthSubmit,
+  } = useAuthForm()
 
   useEffect(() => {
     setMode(location.pathname === '/signup' ? 'signup' : 'login')
@@ -24,6 +38,21 @@ export function AuthPage() {
     login(currentUser)
     navigate('/home', { replace: true })
   }, [currentUser, login, navigate])
+
+  useEffect(() => {
+    if (!shouldRedirectToLogin) {
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setShouldRedirectToLogin(false)
+      navigate('/login', { replace: true })
+    }, 2500)
+
+    return () => {
+      window.clearTimeout(timer)
+    }
+  }, [navigate, setShouldRedirectToLogin, shouldRedirectToLogin])
 
   function handleModeChange(nextMode: 'login' | 'signup') {
     setMode(nextMode)
