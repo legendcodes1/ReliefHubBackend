@@ -1,6 +1,6 @@
 # ReliefHub Frontend
 
-Frontend client for ReliefHub.
+Frontend client for ReliefHub
 
 ## Stack
 
