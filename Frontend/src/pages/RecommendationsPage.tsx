@@ -137,42 +137,34 @@ export function RecommendationsPage() {
   return (
     <main className="space-y-5">
       <section className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-sm sm:p-7">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--accent)]">Recommendation Results</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--accent)]">Step 2 of 3</p>
         <h1 className="mt-2 text-4xl font-semibold leading-tight text-[color:var(--text-strong)]">Your Relief Plan</h1>
-        <p className="mt-2 text-sm text-[color:var(--text-soft)]">Exercises matched to your selected body area and discomfort type.</p>
+        <p className="mt-2 text-sm text-[color:var(--text-soft)]">Based on your selected body area and discomfort type.</p>
         <p className="mt-3 text-sm font-semibold text-[color:var(--text-body)]">
           {hasFilters && !isLoading && !error
             ? `Found ${recommendationsCount} ${recommendationsCount === 1 ? 'exercise' : 'exercises'} for you`
             : getRecommendationCountLabel()}
         </p>
+        <div className="mt-5 grid gap-2 rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-muted)] p-4 sm:grid-cols-3">
+          <p className="rounded-xl border border-[color:var(--line)] bg-white px-3 py-2 text-sm font-semibold text-[color:var(--text-strong)]">1. Review exercises</p>
+          <p className="rounded-xl border border-[color:var(--line)] bg-white px-3 py-2 text-sm font-semibold text-[color:var(--text-strong)]">2. Save favorites</p>
+          <p className="rounded-xl border border-[color:var(--line)] bg-white px-3 py-2 text-sm font-semibold text-[color:var(--text-strong)]">3. Build routine</p>
+        </div>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link to="/home" className="inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--bg-soft)] px-3 py-1.5 text-sm font-medium text-[color:var(--text-body)] transition hover:bg-white">
             Adjust Filters
           </Link>
-          <button
-            type="button"
-            onClick={() => setIsRoutineExpanded(!isRoutineExpanded)}
-            className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--bg-soft)] px-3 py-1.5 text-sm font-medium text-[color:var(--text-body)] transition hover:bg-white"
-          >
-            <span>Build Your Routine</span>
-            {isRoutineExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
         </div>
       </section>
 
-      {isRoutineExpanded && (
-        <div className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-sm sm:p-6">
-          <RoutinePage />
-        </div>
-      )}
       {!hasFilters && (
-        <p className="mt-4 rounded-xl bg-[color:var(--warning-soft)] p-3 text-sm text-[color:var(--warning-text)]">
-          Missing filters. Please return to <Link to="/home" className="underline">home</Link> and select symptom options.
-        </p>
+        <section className="rounded-2xl border border-amber-200 bg-[color:var(--warning-soft)] p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--warning-text)]">Missing filters</p>
+          <p className="mt-2 text-sm text-[color:var(--warning-text)]">Choose your body area and discomfort type first to get matched recommendations.</p>
+          <Link to="/home" className="mt-3 inline-flex rounded-full border border-amber-300 bg-white px-3 py-1.5 text-sm font-semibold text-[color:var(--warning-text)] transition hover:bg-amber-50">
+            Start Your Relief Plan
+          </Link>
+        </section>
       )}
 
       {isLoading && hasFilters && (
@@ -184,8 +176,12 @@ export function RecommendationsPage() {
 
       {!isLoading && !error && hasFilters && exercises.length === 0 && (
         <section className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface)] p-6 text-center">
-          <p className="text-lg font-semibold text-[color:var(--text-strong)]">No exercises found for this combination yet.</p>
-          <p className="mt-2 text-sm text-[color:var(--text-soft)]">Try a different body area or discomfort type to widen your matches.</p>
+          <p className="text-lg font-semibold text-[color:var(--text-strong)]">No close matches yet.</p>
+          <p className="mt-2 text-sm text-[color:var(--text-soft)]">Try adjusting your body area or discomfort type to find a better fit.</p>
+          <Link to="/home" className="mt-4 inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--bg-soft)] px-3 py-1.5 text-sm font-semibold text-[color:var(--text-body)] transition hover:bg-white">
+            Adjust Filters
+          </Link>
+          <p className="mt-2 text-xs text-[color:var(--text-soft)]">More exercises can be added later as the catalog grows.</p>
         </section>
       )}
 
@@ -202,6 +198,32 @@ export function RecommendationsPage() {
             ))}
           </div>
         </section>
+      )}
+
+      {hasFilters && (
+        <section className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-sm sm:p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--accent)]">Next Step</p>
+          <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-strong)]">Build your routine</h2>
+          <p className="mt-2 text-sm text-[color:var(--text-soft)]">Turn your matched exercises into a simple routine you can follow consistently.</p>
+          <button
+            type="button"
+            onClick={() => setIsRoutineExpanded(!isRoutineExpanded)}
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-[color:var(--brand)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[color:var(--brand-strong)]"
+          >
+            <span>{isRoutineExpanded ? 'Hide Routine Builder' : 'Build Your Routine'}</span>
+            {isRoutineExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </button>
+        </section>
+      )}
+
+      {isRoutineExpanded && hasFilters && (
+        <div className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-sm sm:p-6">
+          <RoutinePage />
+        </div>
       )}
     </main>
   )

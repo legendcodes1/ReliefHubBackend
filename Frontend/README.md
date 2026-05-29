@@ -1,6 +1,6 @@
 # ReliefHub Frontend
 
-Frontend client for the Pain Relief / Rehab Hub project.
+Frontend client for ReliefHub.
 
 ## Stack
 
@@ -38,13 +38,25 @@ VITE_API_BASE_URL=http://localhost:4000
 
 ## Current Routes
 
-- `/login`
-- `/signup`
-- `/recommendations`
-- `/exercises/:id`
-- `/saved`
+- Public-only:
+  - `/login`
+  - `/signup`
+- Protected:
+  - `/home`
+  - `/recommendations`
+  - `/exercises/:id`
+  - `/saved`
+  - `/routines`
+  - `/my-routines`
+  - `/community-routines`
+  - `/account`
 
 ## Auth Notes
 
 - Login and signup call backend endpoints under `/api/v1/auth`.
-- Access and refresh tokens are stored in local storage.
+- Access token is stored client-side.
+- Refresh token is managed as an HTTP-only cookie by the backend.
+
+## More Documentation
+
+- Full project docs live at repo root (`../README.md`, `../docs/`, `../CONTEXT.md`).

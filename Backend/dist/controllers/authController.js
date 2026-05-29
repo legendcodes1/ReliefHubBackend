@@ -1,4 +1,5 @@
 import { env } from "../config/env.js";
+import { prisma } from "../lib/prisma.js";
 import { supabase, supabaseAdmin } from "../config/supabase.js";
 const REFRESH_TOKEN_COOKIE_NAME = "rh_refresh_token";
 function getRefreshCookieOptions() {
@@ -27,11 +28,27 @@ function extractBearerToken(authorization) {
     const token = authorization.slice("Bearer ".length).trim();
     return token || null;
 }
-function mapAuthPayload(user, session) {
+function isDuplicateUsernameAuthError(message) {
+    const normalizedMessage = message.toLowerCase();
+    return normalizedMessage.includes("username") || normalizedMessage.includes("users_username_key");
+}
+async function getUsernameByAuthId(authId) {
+    const publicUser = await prisma.public_users.findUnique({
+        where: {
+            auth_id: authId,
+        },
+        select: {
+            username: true,
+        },
+    });
+    return publicUser?.username ?? null;
+}
+function mapAuthPayload(user, username, session) {
     return {
         user: {
             id: user.id,
             email: user.email ?? null,
+            username,
         },
         session: session
             ? {
@@ -41,12 +58,23 @@ function mapAuthPayload(user, session) {
     };
 }
 export async function signup(req, res) {
-    const { email, password } = req.body;
+    const { username, email, password } = req.body;
+    const normalizedUsername = username.toLowerCase();
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+            data: {
+                username: normalizedUsername,
+            },
+        },
     });
     if (error) {
+        if (isDuplicateUsernameAuthError(error.message)) {
+            return res.status(409).json({
+                message: "Username is already taken",
+            });
+        }
         return res.status(400).json({
             message: error.message,
         });
@@ -56,7 +84,7 @@ export async function signup(req, res) {
             message: "Signup failed",
         });
     }
-    const payload = mapAuthPayload(data.user, data.session);
+    const payload = mapAuthPayload(data.user, normalizedUsername, data.session);
     if (data.session?.refresh_token) {
         setRefreshTokenCookie(res, data.session.refresh_token);
     }
@@ -79,10 +107,11 @@ export async function login(req, res) {
             message: "Invalid email or password",
         });
     }
+    const username = await getUsernameByAuthId(data.user.id);
     setRefreshTokenCookie(res, data.session.refresh_token);
     return res.status(200).json({
         message: "Login successful",
-        ...mapAuthPayload(data.user, data.session),
+        ...mapAuthPayload(data.user, username, data.session),
     });
 }
 export async function logout(req, res) {
@@ -113,9 +142,10 @@ export async function refreshSession(req, res) {
         });
     }
     setRefreshTokenCookie(res, data.session.refresh_token);
+    const username = await getUsernameByAuthId(data.user.id);
     return res.status(200).json({
         message: "Session refreshed",
-        ...mapAuthPayload(data.user, data.session),
+        ...mapAuthPayload(data.user, username, data.session),
     });
 }
 export async function me(req, res) {
@@ -124,10 +154,12 @@ export async function me(req, res) {
             message: "Invalid or expired token",
         });
     }
+    const username = await getUsernameByAuthId(req.user.id);
     return res.status(200).json({
         user: {
             id: req.user.id,
             email: req.user.email ?? null,
+            username,
         },
     });
 }

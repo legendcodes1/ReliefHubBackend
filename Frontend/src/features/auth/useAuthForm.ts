@@ -6,6 +6,7 @@ import type { AuthMode, AuthUser } from './authTypes'
 
 export function useAuthForm() {
   const [mode, setMode] = useState<AuthMode>('login')
+  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
@@ -22,7 +23,7 @@ export function useAuthForm() {
     setIsLoading(true)
 
     try {
-      const result = await authenticateUser(mode, email, password)
+      const result = await authenticateUser(mode, { username, email, password })
 
       if (!result.ok || !result.data.user) {
         setError(result.ok ? 'Authentication failed. Please try again.' : result.message)
@@ -34,6 +35,9 @@ export function useAuthForm() {
         setCurrentUser(result.data.user)
         setSuccess(result.data.message ?? 'You are signed in.')
         setPassword('')
+        if (mode === 'signup') {
+          setUsername('')
+        }
         return
       }
 
@@ -45,6 +49,9 @@ export function useAuthForm() {
             : 'Authentication successful.'),
       )
       setPassword('')
+      if (requiresEmailConfirmation) {
+        setUsername('')
+      }
 
       if (requiresEmailConfirmation) {
         clearAuthSession()
@@ -70,6 +77,8 @@ export function useAuthForm() {
   return {
     mode,
     setMode,
+    username,
+    setUsername,
     email,
     setEmail,
     password,

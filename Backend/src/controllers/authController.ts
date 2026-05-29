@@ -1,6 +1,7 @@
 import type { CookieOptions, Request, Response } from "express";
 
 import { env } from "../config/env.js";
+import { prisma } from "../lib/prisma.js";
 import { supabase, supabaseAdmin } from "../config/supabase.js";
 import type { LoginInput, SignupInput } from "../validators/authSchema.js";
 
@@ -38,11 +39,35 @@ function extractBearerToken(authorization?: string) {
   return token || null;
 }
 
-function mapAuthPayload(user: { id: string; email?: string | null }, session?: { access_token: string } | null) {
+function isDuplicateUsernameAuthError(message: string): boolean {
+  const normalizedMessage = message.toLowerCase();
+
+  return normalizedMessage.includes("username") || normalizedMessage.includes("users_username_key");
+}
+
+async function getUsernameByAuthId(authId: string): Promise<string | null> {
+  const publicUser = await prisma.public_users.findUnique({
+    where: {
+      auth_id: authId,
+    },
+    select: {
+      username: true,
+    },
+  });
+
+  return publicUser?.username ?? null;
+}
+
+function mapAuthPayload(
+  user: { id: string; email?: string | null },
+  username: string | null,
+  session?: { access_token: string } | null,
+) {
   return {
     user: {
       id: user.id,
       email: user.email ?? null,
+      username,
     },
     session: session
       ? {
@@ -53,14 +78,26 @@ function mapAuthPayload(user: { id: string; email?: string | null }, session?: {
 }
 
 export async function signup(req: Request<unknown, unknown, SignupInput>, res: Response) {
-  const { email, password } = req.body;
+  const { username, email, password } = req.body;
+  const standardUsername = username.toLowerCase();
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        username: standardUsername,
+      },
+    },
   });
 
   if (error) {
+    if (isDuplicateUsernameAuthError(error.message)) {
+      return res.status(409).json({
+        message: "Username is already taken",
+      });
+    }
+
     return res.status(400).json({
       message: error.message,
     });
@@ -72,7 +109,7 @@ export async function signup(req: Request<unknown, unknown, SignupInput>, res: R
     });
   }
 
-  const payload = mapAuthPayload(data.user, data.session);
+  const payload = mapAuthPayload(data.user, standardUsername, data.session);
 
   if (data.session?.refresh_token) {
     setRefreshTokenCookie(res, data.session.refresh_token);
@@ -102,11 +139,13 @@ export async function login(req: Request<unknown, unknown, LoginInput>, res: Res
     });
   }
 
+  const username = await getUsernameByAuthId(data.user.id);
+
   setRefreshTokenCookie(res, data.session.refresh_token);
 
   return res.status(200).json({
     message: "Login successful",
-    ...mapAuthPayload(data.user, data.session),
+    ...mapAuthPayload(data.user, username, data.session),
   });
 }
 
@@ -147,9 +186,11 @@ export async function refreshSession(req: Request, res: Response) {
 
   setRefreshTokenCookie(res, data.session.refresh_token);
 
+  const username = await getUsernameByAuthId(data.user.id);
+
   return res.status(200).json({
     message: "Session refreshed",
-    ...mapAuthPayload(data.user, data.session),
+    ...mapAuthPayload(data.user, username, data.session),
   });
 }
 
@@ -160,10 +201,13 @@ export async function me(req: Request, res: Response) {
     });
   }
 
+  const username = await getUsernameByAuthId(req.user.id);
+
   return res.status(200).json({
     user: {
       id: req.user.id,
       email: req.user.email ?? null,
+      username,
     },
   });
 }

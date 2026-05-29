@@ -13,6 +13,8 @@ export function AuthPage() {
   const {
     mode,
     setMode,
+    username,
+    setUsername,
     email,
     setEmail,
     password,
@@ -87,10 +89,13 @@ export function AuthPage() {
           <h2 className="mt-2 text-3xl font-semibold text-[color:var(--text-strong)]">{authModeConfig[mode].heading}</h2>
 
           <AuthForm
+            mode={mode}
+            username={username}
             email={email}
             password={password}
             buttonLabel={authModeConfig[mode].buttonLabel}
             isLoading={isLoading}
+            onUsernameChange={setUsername}
             onEmailChange={setEmail}
             onPasswordChange={setPassword}
             onSubmit={handleAuthSubmit}

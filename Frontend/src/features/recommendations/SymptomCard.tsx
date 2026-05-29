@@ -63,8 +63,8 @@ export function SymptomCard() {
   }
 
   return (
-    <section className="mt-7 rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-sm sm:p-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--accent)]">Start Your Plan</p>
+    <section className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-5 shadow-sm sm:p-6">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--accent)]">Start Your Relief Plan</p>
       <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-strong)]">What needs relief today?</h2>
       <p className="mt-2 text-sm text-[color:var(--text-soft)]">Pick your body area and discomfort type to unlock matched exercises.</p>
 
@@ -72,9 +72,9 @@ export function SymptomCard() {
       {error && <p className="mt-4 rounded-xl bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
 
       {!isLoading && !error && (
-        <form className="mt-5 grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
+        <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
           <label className="block">
-            <span className="mb-1 block text-sm font-semibold text-[color:var(--text-body)]">Body Part</span>
+            <span className="mb-2 block text-sm font-semibold text-[color:var(--text-body)]">Body Part</span>
             <select
               value={bodyPartId}
               onChange={(event) => setBodyPartId(event.target.value)}
@@ -91,7 +91,7 @@ export function SymptomCard() {
           </label>
 
           <label className="block">
-            <span className="mb-1 block text-sm font-semibold text-[color:var(--text-body)]">Discomfort Type</span>
+            <span className="mb-2 block text-sm font-semibold text-[color:var(--text-body)]">Discomfort Type</span>
             <select
               value={discomfortTypeId}
               onChange={(event) => setDiscomfortTypeId(event.target.value)}
@@ -109,9 +109,9 @@ export function SymptomCard() {
 
           <button
             type="submit"
-            className="w-full rounded-xl bg-[color:var(--brand)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[color:var(--brand-strong)] sm:col-span-2"
+            className="w-full rounded-xl bg-[color:var(--brand)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[color:var(--brand-strong)]"
           >
-            Find Exercises
+            Start Your Relief Plan
           </button>
         </form>
       )}

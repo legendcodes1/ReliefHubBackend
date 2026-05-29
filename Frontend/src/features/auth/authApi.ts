@@ -1,10 +1,27 @@
 import { requestJson } from '../../lib/apiClient'
 import type { ApiResult, AuthMode, AuthResponse } from './authTypes'
 
-export async function authenticateUser(mode: AuthMode, email: string, password: string): Promise<ApiResult<AuthResponse>> {
+type AuthCredentials = {
+  username: string
+  email: string
+  password: string
+}
+
+export async function authenticateUser(mode: AuthMode, credentials: AuthCredentials): Promise<ApiResult<AuthResponse>> {
+  const body = mode === 'signup'
+    ? {
+        username: credentials.username,
+        email: credentials.email,
+        password: credentials.password,
+      }
+    : {
+        email: credentials.email,
+        password: credentials.password,
+      }
+
   const { response, data } = await requestJson<AuthResponse>(`/api/v1/auth/${mode}`, {
     method: 'POST',
-    body: { email, password },
+    body,
   })
 
   if (!response.ok) {

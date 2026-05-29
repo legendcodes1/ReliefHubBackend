@@ -73,6 +73,7 @@ function PlayIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
 export function ExerciseCard({ exercise, reactions, onReactionsChange }: ExerciseCardProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
+  const [isSaved, setIsSaved] = useState(false)
   const accent = accentStyles[getAccentIndex(exercise.id)]
   const thumbnailUrl = getYouTubeThumbnailUrl(exercise.video_url)
 
@@ -85,12 +86,15 @@ export function ExerciseCard({ exercise, reactions, onReactionsChange }: Exercis
 
       if (!result.response.ok) {
         setSaveMessage('Unable to save this exercise right now.')
+        setIsSaved(false)
         return
       }
 
-      setSaveMessage('Saved.')
+      setIsSaved(true)
+      setSaveMessage('Added to your saved exercises.')
     } catch {
       setSaveMessage('Unable to save this exercise right now.')
+      setIsSaved(false)
     } finally {
       setIsSaving(false)
     }
@@ -158,18 +162,22 @@ export function ExerciseCard({ exercise, reactions, onReactionsChange }: Exercis
       )}
 
       <div className="mt-auto flex items-center gap-2 pt-3">
-        <Link to={`/exercises/${exercise.id}`} className="rounded-xl border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-medium text-[color:var(--text-strong)] transition hover:bg-[color:var(--bg-soft)]">
-          View Details
-        </Link>
         <button
           type="button"
           onClick={handleSave}
           disabled={isSaving}
-          className="rounded-xl bg-[color:var(--brand)] px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-[color:var(--brand-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+          className={`rounded-xl px-3 py-1.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+            isSaved
+              ? 'border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+              : 'bg-[color:var(--brand)] text-white hover:bg-[color:var(--brand-strong)]'
+          }`}
         >
-          {isSaving ? 'Saving...' : 'Save'}
+          {isSaving ? 'Saving...' : isSaved ? 'Saved' : 'Save Exercise'}
         </button>
-        {saveMessage && <span className="text-xs text-stone-600">{saveMessage}</span>}
+        <Link to={`/exercises/${exercise.id}`} className="rounded-xl border border-[color:var(--line)] bg-white px-3 py-1.5 text-sm font-medium text-[color:var(--text-strong)] transition hover:bg-[color:var(--bg-soft)]">
+          View Details
+        </Link>
+        {saveMessage && <span className={`text-xs ${isSaved ? 'text-emerald-700' : 'text-stone-600'}`}>{saveMessage}</span>}
       </div>
     </article>
   )
