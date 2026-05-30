@@ -45,32 +45,32 @@ function getAccentIndex(id: string) {
   return value % accentStyles.length
 }
 
-function ClockIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-3 w-3">
-      <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M10 6.8v3.6l2.6 1.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
+// function ClockIcon() {
+//   return (
+//     <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-3 w-3">
+//       <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+//       <path d="M10 6.8v3.6l2.6 1.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+//     </svg>
+//   )
+// }
 
-function LevelIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-3 w-3">
-      <path d="M4 13.5h2.2M8.3 10.5h3M13.4 7.5H16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M3.8 13.5a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6ZM8 10.5a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6ZM13.1 7.5a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6Z" fill="currentColor" />
-    </svg>
-  )
-}
+// function LevelIcon() {
+//   return (
+//     <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-3 w-3">
+//       <path d="M4 13.5h2.2M8.3 10.5h3M13.4 7.5H16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+//       <path d="M3.8 13.5a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6ZM8 10.5a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6ZM13.1 7.5a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6Z" fill="currentColor" />
+//     </svg>
+//   )
+// }
 
-function PlayIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className={className}>
-      <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.4" />
-      <path d="M8.5 7.6v4.8l4-2.4-4-2.4Z" fill="currentColor" />
-    </svg>
-  )
-}
+// function PlayIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
+//   return (
+//     <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className={className}>
+//       <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.4" />
+//       <path d="M8.5 7.6v4.8l4-2.4-4-2.4Z" fill="currentColor" />
+//     </svg>
+//   )
+// }
 
 export function ExerciseCard({ exercise, isSaved, onSavedChange, reactions, onReactionsChange }: ExerciseCardProps) {
   const [isSaving, setIsSaving] = useState(false)
