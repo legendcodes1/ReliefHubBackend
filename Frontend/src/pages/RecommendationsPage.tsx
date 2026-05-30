@@ -5,6 +5,7 @@ import { ChevronUp, ChevronDown } from 'lucide-react'
 import { ExerciseCard } from '../features/recommendations/ExerciseCard'
 import { getRecommendations } from '../features/recommendations/recommendationsApi'
 import { getBatchReactions } from '../features/recommendations/reactionsApi'
+import { getSavedExercises } from '../features/saved-exercises/savedExercisesApi'
 import type { Exercise } from '../features/recommendations/recommendationTypes'
 import type { ReactionType } from '../features/recommendations/reactionsApi'
 import RoutinePage from './RoutinePage'
@@ -28,6 +29,7 @@ export function RecommendationsPage() {
   const [error, setError] = useState('')
   const [isRoutineExpanded, setIsRoutineExpanded] = useState(false)
   const [reactions, setReactions] = useState<Record<string, ReactionData>>({})
+  const [savedExerciseIds, setSavedExerciseIds] = useState<Set<string>>(new Set())
 
   const hasFilters = Boolean(bodyPartId && discomfortTypeId)
   const recommendationsCount = exercises.length
@@ -134,6 +136,27 @@ export function RecommendationsPage() {
     }
   }, [exercises])
 
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadSavedExercises() {
+      try {
+        const result = await getSavedExercises()
+        if (result.response.ok && isMounted) {
+          setSavedExerciseIds(new Set(result.data.map(s => s.exercise_id)))
+        }
+      } catch {
+        // saved exercises are optional
+      }
+    }
+
+    loadSavedExercises()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   return (
     <main className="space-y-5">
       <section className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--surface)] p-6 shadow-sm sm:p-7">
@@ -192,6 +215,15 @@ export function RecommendationsPage() {
               <ExerciseCard
                 key={exercise.id}
                 exercise={exercise}
+                isSaved={savedExerciseIds.has(exercise.id)}
+                onSavedChange={(exerciseId, saved) => {
+                  setSavedExerciseIds(prev => {
+                    const next = new Set(prev)
+                    if (saved) next.add(exerciseId)
+                    else next.delete(exerciseId)
+                    return next
+                  })
+                }}
                 reactions={reactions[exercise.id]}
                 onReactionsChange={handleReactionsChange}
               />

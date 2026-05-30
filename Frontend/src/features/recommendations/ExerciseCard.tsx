@@ -13,6 +13,8 @@ type ReactionCounts = {
 
 type ExerciseCardProps = {
   exercise: Exercise
+  isSaved: boolean
+  onSavedChange: (exerciseId: string, saved: boolean) => void
   reactions?: {
     counts: ReactionCounts
     userReaction: ReactionType | null
@@ -70,10 +72,9 @@ function PlayIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
   )
 }
 
-export function ExerciseCard({ exercise, reactions, onReactionsChange }: ExerciseCardProps) {
+export function ExerciseCard({ exercise, isSaved, onSavedChange, reactions, onReactionsChange }: ExerciseCardProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
-  const [isSaved, setIsSaved] = useState(false)
   const accent = accentStyles[getAccentIndex(exercise.id)]
   const thumbnailUrl = getYouTubeThumbnailUrl(exercise.video_url)
 
@@ -86,15 +87,13 @@ export function ExerciseCard({ exercise, reactions, onReactionsChange }: Exercis
 
       if (!result.response.ok) {
         setSaveMessage('Unable to save this exercise right now.')
-        setIsSaved(false)
         return
       }
 
-      setIsSaved(true)
+      onSavedChange(exercise.id, true)
       setSaveMessage('Added to your saved exercises.')
     } catch {
       setSaveMessage('Unable to save this exercise right now.')
-      setIsSaved(false)
     } finally {
       setIsSaving(false)
     }
