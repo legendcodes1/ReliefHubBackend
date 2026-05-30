@@ -131,7 +131,7 @@ export function ExerciseCard({ exercise, isSaved, onSavedChange, reactions, onRe
 
       <p className="text-sm leading-relaxed text-[color:var(--text-body)]">{exercise.description}</p>
 
-      <div className="mt-4 flex flex-wrap gap-2 text-xs">
+      {/* <div className="mt-4 flex flex-wrap gap-2 text-xs">
         {exercise.duration_minutes !== null && exercise.duration_minutes !== undefined && (
           <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-emerald-800">
             <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-200/70 text-emerald-900"><ClockIcon /></span>
@@ -150,7 +150,7 @@ export function ExerciseCard({ exercise, isSaved, onSavedChange, reactions, onRe
             Video
           </span>
         )}
-      </div>
+      </div> */}
 
       {onReactionsChange && (
         <ExerciseReactionControls
