@@ -45,23 +45,7 @@ function getAccentIndex(id: string) {
   return value % accentStyles.length
 }
 
-// function ClockIcon() {
-//   return (
-//     <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-3 w-3">
-//       <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-//       <path d="M10 6.8v3.6l2.6 1.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-//     </svg>
-//   )
-// }
 
-// function LevelIcon() {
-//   return (
-//     <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-3 w-3">
-//       <path d="M4 13.5h2.2M8.3 10.5h3M13.4 7.5H16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-//       <path d="M3.8 13.5a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6ZM8 10.5a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6ZM13.1 7.5a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6Z" fill="currentColor" />
-//     </svg>
-//   )
-// }
 
 function PlayIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
   return (
@@ -130,27 +114,6 @@ export function ExerciseCard({ exercise, isSaved, onSavedChange, reactions, onRe
       )}
 
       <p className="text-sm leading-relaxed text-[color:var(--text-body)]">{exercise.description}</p>
-
-      {/* <div className="mt-4 flex flex-wrap gap-2 text-xs">
-        {exercise.duration_minutes !== null && exercise.duration_minutes !== undefined && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-emerald-800">
-            <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-200/70 text-emerald-900"><ClockIcon /></span>
-            {exercise.duration_minutes} min
-          </span>
-        )}
-        {exercise.difficulty_level && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-1 text-cyan-800">
-            <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-cyan-200/70 text-cyan-900"><LevelIcon /></span>
-            {exercise.difficulty_level}
-          </span>
-        )}
-        {exercise.video_url && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-sky-900">
-            <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-sky-200/70 text-sky-900"><PlayIcon /></span>
-            Video
-          </span>
-        )}
-      </div> */}
 
       {onReactionsChange && (
         <ExerciseReactionControls
