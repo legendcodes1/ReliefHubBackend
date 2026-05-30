@@ -63,14 +63,14 @@ function getAccentIndex(id: string) {
 //   )
 // }
 
-// function PlayIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
-//   return (
-//     <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className={className}>
-//       <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.4" />
-//       <path d="M8.5 7.6v4.8l4-2.4-4-2.4Z" fill="currentColor" />
-//     </svg>
-//   )
-// }
+function PlayIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className={className}>
+      <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M8.5 7.6v4.8l4-2.4-4-2.4Z" fill="currentColor" />
+    </svg>
+  )
+}
 
 export function ExerciseCard({ exercise, isSaved, onSavedChange, reactions, onReactionsChange }: ExerciseCardProps) {
   const [isSaving, setIsSaving] = useState(false)
